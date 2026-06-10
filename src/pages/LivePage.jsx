@@ -221,7 +221,7 @@ function TeamCell({ row }) {
 function StandingTable({ rows }) {
     return (
         <div style={styles.tableWrapper}>
-            <table style={styles.table}>
+            <table className="live-table" style={styles.table}>
                 <colgroup>
                     <col style={{ width: 44 }} />
                     <col style={{ width: 300 }} />
