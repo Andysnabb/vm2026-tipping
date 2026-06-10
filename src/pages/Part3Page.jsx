@@ -1,7 +1,9 @@
 
 
 import { useEffect, useMemo, useState } from "react";
-const API_URL = import.meta.env.VITE_API_URL;
+//const API_URL = import.meta.env.VITE_API_URL;
+import { API_BASE } from "../config";
+
 // Samme struktur som i VM-arket / LivePage
 const ROUND_OF_32_MATCHES = [["A2", "C1"], ["B2", "F2"], ["E1", "F1"], ["3C", "C2"], ["G1", "D1"], ["3A", "3B"], ["H1", "K2"], ["J2", "L2"], ["E2", "I1"], ["I2", "3F"], ["A1", "L1"], ["3H", "3E"], ["B1", "D2"], ["3G", "G2"], ["J1", "K1"], ["H2", "3D"]];
 const EMPTY = { roundOf32: Array(16).fill(""), roundOf16: Array(8).fill(""), quarterfinals: Array(4).fill(""), semifinals: Array(2).fill(""), bronze: Array(1).fill(""), final: Array(1).fill("") };
@@ -58,7 +60,7 @@ export default function Part3Page() {
     }, []);
 
     async function load() {
-        if (!API_URL || !inputId.trim()) return;
+        if (!API_BASE || !inputId.trim()) return;
 
         const id = inputId.trim();
 
@@ -67,7 +69,7 @@ export default function Part3Page() {
         setParticipantId(id);
 
         const res = await fetch(
-            `${API_URL}?action=submission&participantId=${encodeURIComponent(id)}`
+            `${API_BASE}?action=submission&participantId=${encodeURIComponent(id)}`
         );
         const data = await res.json();
         if (data?.ok && data.submission?.part3Json) {
@@ -80,9 +82,9 @@ export default function Part3Page() {
     }
 
     async function save() {
-        if (!participantId || !API_URL) return;
+        if (!participantId || !API_BASE) return;
 
-        await fetch(API_URL, {
+        await fetch(API_BASE, {
             method: "POST",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({
