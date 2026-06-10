@@ -127,3 +127,8 @@ input, select {
 small {
   color: #94a3b8;
 }
+
+.group-title {
+  color: black;
+  font-weight: 600;
+}
