@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL;
+//const API_URL = import.meta.env.VITE_API_URL;
+import { API_BASE } from "../config";
 
 export default function AnswersPage() {
     const [data, setData] = useState([]);
@@ -25,11 +26,11 @@ export default function AnswersPage() {
 
     useEffect(() => {
         async function load() {
-            if (!API_URL) return;
+            if (!API_BASE) return;
 
             setLoading(true);
 
-            const res = await fetch(`${API_URL}?action=all`);
+            const res = await fetch(`${API_BASE}?action=all`);
             const result = await res.json();
 
             if (result.ok) {
