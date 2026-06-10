@@ -2,12 +2,17 @@ import { API_BASE } from "../config";
 
 export async function getSubmission(participantId) {
     const res = await fetch(
-        `${API_BASE}?action=submission&participantId=${encodeURIComponent(participantId)}`
+        `${API_BASE}?action=submission&participantId=${encodeURIComponent(participantId)}`,
+        {
+            method: "GET",
+            redirect: "follow"
+        }
     );
 
     const contentType = res.headers.get("content-type") || "";
+
     if (contentType.includes("application/json")) {
-        return res.json();
+        return await res.json();
     }
 
     const text = await res.text();
@@ -16,7 +21,11 @@ export async function getSubmission(participantId) {
 
 export async function getActuals() {
     try {
-        const res = await fetch(`${API_BASE}?action=getActuals`);
+        const res = await fetch(`${API_BASE}?action=getActuals`, {
+            method: "GET",
+            redirect: "follow"
+        });
+
         const contentType = res.headers.get("content-type") || "";
 
         if (contentType.includes("application/json")) {
@@ -45,8 +54,9 @@ export async function saveActual(payload) {
     try {
         const res = await fetch(API_BASE, {
             method: "POST",
+            redirect: "follow",
             headers: {
-                "Content-Type": "application/json;charset=UTF-8"
+                "Content-Type": "text/plain;charset=utf-8"
             },
             body: JSON.stringify({
                 action: "saveActual",
@@ -83,8 +93,9 @@ export async function savePart(payload) {
     try {
         const res = await fetch(API_BASE, {
             method: "POST",
+            redirect: "follow",
             headers: {
-                "Content-Type": "application/json;charset=UTF-8"
+                "Content-Type": "text/plain;charset=utf-8"
             },
             body: JSON.stringify({
                 action: "savePartV2",
@@ -108,3 +119,4 @@ export async function savePart(payload) {
         return { ok: false, error: String(err) };
     }
 }
+``
