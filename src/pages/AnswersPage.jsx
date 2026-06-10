@@ -178,7 +178,7 @@ export default function AnswersPage() {
                     <table style={{ borderCollapse: "collapse", width: "100%", tableLayout: "fixed" }}>
                         <thead>
                             <tr>
-                                <th style={{ border: "1px solid #ccc", padding: 8, width: 40 }}>
+                                <th style={{ border: "1px solid #ccc", padding: 8, width: 100 }}>
                                     Spm.
                                 </th>
 
@@ -269,6 +269,8 @@ export default function AnswersPage() {
                                             border: "1px solid #ccc",
                                             padding: 6,
                                             width: 120,
+                                            fontWeight: "bold",
+                                            backgroundColor : "#f5f5f5",
                                             wordBreak: "break-word"
                                         }}
                                     >
