@@ -485,9 +485,7 @@ export default function LivePage() {
 const styles = {
     page: {
         padding: 20,
-        backgroundColor: "#f6f7fb",
         minHeight: "100vh",
-        color: "#111827"
     },
     headerRow: {
         display: "flex",
@@ -531,7 +529,6 @@ const styles = {
     },
     tableWrapper: {
         overflowX: "auto",
-        backgroundColor: "#ffffff",
         border: "1px solid #e5e7eb",
         borderRadius: 12,
         boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
@@ -541,7 +538,6 @@ const styles = {
         minWidth: 590,
         tableLayout: "fixed",
         borderCollapse: "collapse",
-        backgroundColor: "#ffffff"
     },
     teamCell: {
         display: "flex",
