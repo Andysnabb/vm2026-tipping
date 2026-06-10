@@ -1,7 +1,8 @@
 
 import { useEffect, useState } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL;
+//const API_URL = import.meta.env.VITE_API_URL;
+import { API_BASE } from "../config";
 
 const GROUPS = {
     A: ["Mexico", "South Africa", "South Korea", "Czech Republic"],
@@ -45,7 +46,7 @@ export default function Part1Page() {
     }, []);
 
     async function load() {
-        if (!inputId || !API_URL) return;
+        if (!inputId || !API_BASE) return;
 
         const id = inputId.trim();
 
@@ -54,7 +55,7 @@ export default function Part1Page() {
         setParticipantId(id);
 
         const res = await fetch(
-            `${API_URL}?action=submission&participantId=${id}`
+            `${API_BASE}?action=submission&participantId=${id}`
         );
 
         const data = await res.json();
@@ -85,7 +86,7 @@ export default function Part1Page() {
 
         setLoading(true);
 
-        const res = await fetch(API_URL, {
+        const res = await fetch(API_BASE, {
             method: "POST",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({
