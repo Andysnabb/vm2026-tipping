@@ -1,15 +1,137 @@
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    'background-color: #f5f5f5;'
-    color: #222;
+/* === RESET === */
+* {
+  box-sizing: border-box;
 }
 
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  color: #222;
+}
+
+/* === LINKER === */
 a {
-    text-decoration: none;
-    color: blue;
+  text-decoration: none;
+  color: #2563eb;
 }
 
 nav a {
-    font-weight: bold;
+  font-weight: bold;
+}
+
+/* === CONTAINER === */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* === KORT (alle sider blir pene automatisk) === */
+.card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+/* === NAV KNAPPER === */
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.nav-button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #e5e7eb;
+  color: #111827;
+  text-decoration: none;
+  transition: 0.15s;
+}
+
+.nav-button:hover {
+  background: #d1d5db;
+}
+
+.nav-button.active {
+  background: #2563eb;
+  color: white;
+}
+
+/* === GENERELLE TABELLER === */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+/* header */
+th {
+  background: #2563eb;
+  color: white;
+  text-align: left;
+  padding: 8px;
+}
+
+/* celler */
+td {
+  padding: 8px;
+  border-top: 1px solid #ddd;
+}
+
+/* zebra stripes (viktig for lesbarhet) */
+tr:nth-child(even) td {
+  background: #f9fafb;
+}
+
+/* hover */
+tr:hover td {
+  background: #e5f0ff;
+}
+
+/* === LIVE TABLE (egen tuning) === */
+.live-table tr:nth-child(even) td {
+  background: #eef2ff;
+}
+
+.live-table tr:nth-child(odd) td {
+  background: #ffffff;
+}
+
+/* === DEL 1 / GROUP === */
+.group-table td:first-child,
+.group-table th:first-child {
+  min-width: 40px;
+  text-align: center;
+}
+
+/* === SVAR === */
+.answers-table td:first-child,
+.answers-table th:first-child {
+  background: #e5e7eb;
+  color: #111827;
+  font-weight: 600;
+}
+
+/* === LEADERBOARD === */
+.leaderboard-table td:first-child {
+  font-weight: bold;
+}
+
+/* === INPUTS === */
+input, select {
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+  color: #111;
+}
+
+/* === SMÅTEKST === */
+small {
+  color: #666;
 }
