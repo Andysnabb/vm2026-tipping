@@ -50,6 +50,27 @@ h1, h2, h3 {
   box-shadow: 0 6px 16px rgba(59,130,246,0.4);
 }
 
+.group-table td:first-child,
+.group-table th:first-child {
+  min-width: 40px;
+  width: 50px;
+  text-align: center;
+}
+
+.answers-table td:first-child,
+.answers-table th:first-child {
+  background: #1e293b;
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.leaderboard-table td:first-child,
+.leaderboard-table th:first-child {
+  background: #1e293b;
+  color: #fff;
+  font-weight: 600;
+}
+
 /* === NAVIGATION BUTTONS (veldig viktig for deg) === */
 .nav-buttons {
   display: flex;
@@ -131,4 +152,12 @@ small {
 .group-title {
   color: black;
   font-weight: 600;
+}
+
+.live-table td {
+  background: rgba(51, 65, 85, 0.6);
+}
+
+.live-table tr:nth-child(even) td {
+  background: rgba(71, 85, 105, 0.6);
 }
