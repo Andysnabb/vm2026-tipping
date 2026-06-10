@@ -115,7 +115,7 @@ export default function AnswersPage() {
                     <table style={{ borderCollapse: "collapse", width: "100%", tableLayout: "fixed" }}>
                         <thead>
                             <tr>
-                                <th style={{ border: "1px solid #ccc", padding: 2, width: 5 }}></th>
+                                <th style={{ border: "1px solid #ccc", padding: 2, width: 20 }}></th>
                                 {data.map((row) => (
                                     <th
                                         key={row.participantId}
