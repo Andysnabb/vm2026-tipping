@@ -1,15 +1,129 @@
+/* === RESET & BASE === */
+* {
+  box-sizing: border-box;
+}
+
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    color: #222;
+  margin: 0;
+  font-family: system-ui, Arial, sans-serif;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #e2e8f0;
 }
 
-a {
-    text-decoration: none;
-    color: blue;
+/* === CONTAINER === */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-nav a {
-    font-weight: bold;
+/* === HEADINGS === */
+h1, h2, h3 {
+  color: #f8fafc;
+  margin-bottom: 10px;
+}
+
+/* === CARD (bruk rundt alt innhold) === */
+.card {
+  background: linear-gradient(145deg, #1e293b, #334155);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  margin-bottom: 20px;
+}
+
+/* === BUTTONS (generelt) === */
+.button {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+  box-shadow: 0 6px 16px rgba(59,130,246,0.4);
+}
+
+/* === NAVIGATION BUTTONS (veldig viktig for deg) === */
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.nav-button {
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: none;
+  background: #1e293b;
+  color: #cbd5f5;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.nav-button:hover {
+  background: #334155;
+}
+
+.nav-button.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 6px 16px rgba(59,130,246,0.4);
+}
+
+/* === TABLE === */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(30, 41, 59, 0.8);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+/* HEADER */
+th {
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  color: white;
+  padding: 10px;
+  font-weight: 600;
+  text-align: left;
+}
+
+/* CELLS */
+td {
+  padding: 8px;
+  border-top: 1px solid #334155;
+  background: rgba(15, 23, 42, 0.8);
+}
+
+/* STRIPES */
+tr:nth-child(even) td {
+  background: rgba(30, 41, 59, 0.8);
+}
+
+/* HOVER */
+tr:hover td {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+/* === INPUTS === */
+input, select {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+/* === SMALL TEXT === */
+small {
+  color: #94a3b8;
 }
