@@ -4,7 +4,14 @@ export async function getSubmission(participantId) {
     const res = await fetch(
         `${API_BASE}?action=submission&participantId=${encodeURIComponent(participantId)}`
     );
-    return res.json();
+
+    const contentType = res.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+        return res.json();
+    }
+
+    const text = await res.text();
+    return { ok: false, status: res.status, raw: text };
 }
 
 export async function getActuals() {
@@ -36,17 +43,16 @@ export async function getActuals() {
 
 export async function saveActual(payload) {
     try {
-        const body = new URLSearchParams();
-        body.append("action", "saveActual");
-        body.append("password", payload?.password || "");
-        body.append("data", JSON.stringify(payload?.data || {}));
-
         const res = await fetch(API_BASE, {
             method: "POST",
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+                "Content-Type": "application/json;charset=UTF-8"
             },
-            body: body.toString()
+            body: JSON.stringify({
+                action: "saveActual",
+                password: payload?.password || "",
+                data: payload?.data || {}
+            })
         });
 
         const contentType = res.headers.get("content-type") || "";
@@ -74,21 +80,31 @@ export async function saveActual(payload) {
 }
 
 export async function savePart(payload) {
-    const body = new URLSearchParams();
-    body.append("action", "savePartV2");
-    body.append("participantId", payload.participantId || "");
-    body.append("part", payload.part || "");
-    body.append("name", payload.name || "");
-    body.append("email", payload.email || "");
-    body.append("data", JSON.stringify(payload.data || {}));
+    try {
+        const res = await fetch(API_BASE, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8"
+            },
+            body: JSON.stringify({
+                action: "savePartV2",
+                participantId: payload?.participantId || "",
+                part: payload?.part || "",
+                name: payload?.name || "",
+                email: payload?.email || "",
+                data: payload?.data || {}
+            })
+        });
 
-    const res = await fetch(API_BASE, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-        },
-        body: body.toString()
-    });
+        const contentType = res.headers.get("content-type") || "";
 
-    return res.json();
+        if (contentType.includes("application/json")) {
+            return await res.json();
+        }
+
+        const text = await res.text();
+        return { ok: false, status: res.status, raw: text };
+    } catch (err) {
+        return { ok: false, error: String(err) };
+    }
 }
