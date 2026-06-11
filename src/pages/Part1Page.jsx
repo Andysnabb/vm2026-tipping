@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 
 //const API_URL = import.meta.env.VITE_API_URL;
@@ -39,6 +38,11 @@ export default function Part1Page() {
     const [state, setState] = useState(EMPTY);
     const [loading, setLoading] = useState(false);
 
+    // SPERREDATO SETT TIL 11. JUNI 2026 KL. 21:05
+    const SPERRE_DATO = new Date("2026-06-11T21:05:00");
+    const nå = new Date();
+    const erLåst = nå >= SPERRE_DATO; // MERK: Vi bruker >= siden siden skal LÅSES fra og med dette tidspunktet
+
     useEffect(() => {
         const id = getId();
         setParticipantId(id);
@@ -78,6 +82,12 @@ export default function Part1Page() {
     }
 
     async function save() {
+        // Ekstra sikkerhet: Stopper lagring hvis tidsfristen er ute
+        if (erLåst) {
+            alert("Tidsfristen for å registrere eller endre svar har utløpt.");
+            return;
+        }
+
         let id = participantId.trim();
 
         if (!id) {
@@ -134,6 +144,30 @@ export default function Part1Page() {
         );
     }
 
+    // VIS LÅST SKJERM HVIS FRISTEN ER PASSERT
+    if (erLåst) {
+        return (
+            <div style={{ 
+                padding: 40, 
+                textAlign: "center", 
+                fontFamily: "sans-serif",
+                marginTop: "10%" 
+            }}>
+                <h1 style={{ fontSize: "2.5rem", marginBottom: 10 }}>🔒 Konkurransen er stengt</h1>
+                <p style={{ fontSize: "1.2rem", color: "#666" }}>
+                    Tidsfristen for å levere eller endre svar gikk ut {SPERRE_DATO.toLocaleString("no-NO", { 
+                        day: "numeric", 
+                        month: "long", 
+                        hour: "2-digit", 
+                        minute: "2-digit" 
+                    })}.
+                </p>
+                <p style={{ fontSize: "1rem", color: "#888", marginTop: 20 }}>
+                    Du kan ikke lenger gjøre endringer i dine tips.
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div style={{ padding: 20 }}>
