@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState } from "react";
 import { getSubmission, savePart } from "../lib/api";
 // Part2Page component
@@ -72,6 +70,10 @@ export default function Part2Page() {
     const [answers, setAnswers] = useState(EMPTY_ANSWERS);
     const [message, setMessage] = useState("");
 
+    // SPERREDATO SETT TIL 11. JUNI 2026 KL. 21:05
+    const SPERRE_DATO = new Date("2026-06-11T21:05:00");
+    const nå = new Date();
+    const erLåst = nå >= SPERRE_DATO;
 
     function update(field, value) {
         setAnswers(prev => ({
@@ -107,6 +109,12 @@ export default function Part2Page() {
     async function handleSubmit() {
         setMessage("");
 
+        // Ekstra sikkerhet på API-kallet
+        if (erLåst) {
+            setMessage("Tidsfristen for å registrere eller endre svar har utløpt.");
+            return;
+        }
+
         if (!participantId) {
             setMessage("Skriv inn deltaker-ID");
             return;
@@ -138,6 +146,31 @@ export default function Part2Page() {
         } catch {
             setMessage("Feil ved lagring");
         }
+    }
+
+    // VIS LÅST SKJERM HVIS FRISTEN ER PASSERT
+    if (erLåst) {
+        return (
+            <div style={{ 
+                padding: 40, 
+                textAlign: "center", 
+                fontFamily: "sans-serif",
+                marginTop: "10%" 
+            }}>
+                <h1 style={{ fontSize: "2.5rem", marginBottom: 10 }}>🔒 Konkurransen er stengt</h1>
+                <p style={{ fontSize: "1.2rem", color: "#666" }}>
+                    Tidsfristen for å levere eller endre svar gikk ut {SPERRE_DATO.toLocaleString("no-NO", { 
+                        day: "numeric", 
+                        month: "long", 
+                        hour: "2-digit", 
+                        minute: "2-digit" 
+                    })}.
+                </p>
+                <p style={{ fontSize: "1rem", color: "#888", marginTop: 20 }}>
+                    Du kan ikke lenger gjøre endringer i dine tips.
+                </p>
+            </div>
+        );
     }
 
     return (
@@ -332,7 +365,6 @@ export default function Part2Page() {
             <button onClick={handleSubmit}>Lagre del 2</button>
 
             {message && <p>{message}</p>}
-
 
         </div>
     );
