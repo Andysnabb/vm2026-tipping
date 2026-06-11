@@ -10,7 +10,7 @@ export default function AnswersPage() {
 
     // 1. SETT TIDSPUNKTET FOR NÅR SIDEN SKAL ÅPNES HER
     // Format: ÅÅÅÅ-MM-DDTHH:MM:SS (f.eks. 15. juli kl. 18:00)
-    const LANSERINGS_DATO = new Date("2026-07-15T18:00:00");
+    const LANSERINGS_DATO = new Date("2026-06-11T21:00:00");
     const nå = new Date();
     const erLåst = nå < LANSERINGS_DATO;
 
