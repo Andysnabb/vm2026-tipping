@@ -8,7 +8,13 @@ export default function AnswersPage() {
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState("part1");
 
-                        const labels = {
+    // 1. SETT TIDSPUNKTET FOR NÅR SIDEN SKAL ÅPNES HER
+    // Format: ÅÅÅÅ-MM-DDTHH:MM:SS (f.eks. 15. juli kl. 18:00)
+    const LANSERINGS_DATO = new Date("2026-07-15T18:00:00");
+    const nå = new Date();
+    const erLåst = nå < LANSERINGS_DATO;
+
+    const labels = {
         q1: "Toppscorer",  
         q2: "Ant. mål for toppscorer",
         q3: "Mestscorende lag",
@@ -26,6 +32,12 @@ export default function AnswersPage() {
 
     useEffect(() => {
         async function load() {
+            // Hvis siden er låst, trenger vi ikke hente data fra Google Sheets engang
+            if (erLåst) {
+                setLoading(false);
+                return;
+            }
+
             if (!API_BASE) return;
 
             setLoading(true);
@@ -43,12 +55,46 @@ export default function AnswersPage() {
         }
 
         load();
-    }, []);
+    }, [erLåst]); // Lagt til erLåst som dependency
 
     if (loading) {
         return <div>Laster...</div>;
     }
 
+    // 2. VIS DENNE SKJERMEN HVIS TIDEN IKKE HAR PASSERT ENDA
+    if (erLåst) {
+        return (
+            <div style={{ 
+                padding: 40, 
+                textAlign: "center", 
+                fontFamily: "sans-serif",
+                marginTop: "10%" 
+            }}>
+                <h1 style={{ fontSize: "2.5rem", marginBottom: 10 }}>🔒 Svarene er låst</h1>
+                <p style={{ fontSize: "1.2rem", color: "#666" }}>
+                    Resultatene og deltakernes svar blir tilgjengelige her så snart tidsfristen har gått ut.
+                </p>
+                <div style={{ 
+                    display: "inline-block", 
+                    marginTop: 20, 
+                    padding: "10px 20px", 
+                    background: "#f5f5f5", 
+                    borderRadius: 8,
+                    fontWeight: "bold",
+                    border: "1px solid #ddd"
+                }}>
+                    Åpner: {LANSERINGS_DATO.toLocaleString("no-NO", { 
+                        day: "numeric", 
+                        month: "long", 
+                        hour: "2-digit", 
+                        minute: "2-digit" 
+                    })}
+                </div>
+            </div>
+        );
+    }
+
+    // 3. HVIS TIDEN ER INNE, VISES HELE SIDEN SOM VANLIG UNDER HER
     return (
         <div style={{ padding: 20 }}>
             <h1>Alle svar</h1>
@@ -345,4 +391,4 @@ export default function AnswersPage() {
             )}
         </div>
     );
-} 
+}
