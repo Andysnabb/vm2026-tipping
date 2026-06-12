@@ -69,11 +69,13 @@ function readLocalActual() {
 function buildActual(serverActual = null) { 
     const { storedPart2, storedLive } = readLocalActual(); 
     return { 
-        groups: { ...(ACTUAL.groups || {}), ...(serverActual?.groups || {}), ...(storedLive.groups || {}) }, 
-        part2: { ...(ACTUAL.part2 || {}), ...(storedPart2 || {}), ...(storedLive.part2 || {}), ...(serverActual?.part2 || {}) }, 
-        knockout: { ...(ACTUAL.knockout || {}), ...(serverActual?.knockout || {}), ...(storedLive.knockout || {}) } 
+        // Vi må sørge for at serverActual (som inneholder live-data fra getActuals()) 
+        // eller storedLive (lokal live-kilde) har prioritet over de tomme malene.
+        groups: { ...(ACTUAL.groups || {}), ...(serverActual?.groups || {}), ...(storedLive?.groups || {}) }, 
+        part2: { ...(ACTUAL.part2 || {}), ...(storedPart2 || {}), ...(serverActual?.part2 || {}), ...(storedLive?.part2 || {}) }, 
+        knockout: { ...(ACTUAL.knockout || {}), ...(serverActual?.knockout || {}), ...(storedLive?.knockout || {}) } 
     }; 
-} 
+}
 
 function pointsPart1(row, actual) { 
     const part1 = safeJsonParse(row.part1Json, { groups: {} }); 
