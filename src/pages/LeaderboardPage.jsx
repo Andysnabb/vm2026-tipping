@@ -108,7 +108,8 @@ export default function LeaderboardPage() {
     const [loading, setLoading] = useState(true);
 
 // REGLER DEL 1: 1 poeng for riktig plass (1-4) + 2 poeng ekstra for riktig gruppevinner
-const pointsPart1 = (participant, currentActual) => {
+// DØNN SOLID UTGAVE BASERT PÅ API-ETS EGNE DATA ("p" = SPILTE KAMPER)
+    const pointsPart1 = (participant, currentActual) => {
         if (!participant?.groups || !currentActual?.groups) return 0;
         let score = 0;
 
@@ -129,21 +130,27 @@ const pointsPart1 = (participant, currentActual) => {
             const cleanLetter = cleanGroupKey(groupLetter);
             const userOrder = userGroupsCleaned[cleanLetter] || [];
             
-            // SJEKK: Teller opp totalt antall spilte kamper i denne gruppen akkurat nå
-            const totalGroupMatchesPlayed = actualRows.reduce((sum, row) => sum + (row.played || 0), 0);
-            
-            // Hvis ingen av lagene i gruppen har spilt en eneste kamp ennå, hopper vi over!
-            if (totalGroupMatchesPlayed === 0) {
-                continue; 
+            // SJEKK: Gå gjennom radene og se om NOEN av lagene har spilt kamper (p > 0)
+            const hasPlayedMatches = actualRows.some(row => {
+                // Sjekker både row.p (played) og row.pts (points) i tilfelle tallene tolkes ulikt
+                const played = row?.p !== undefined ? row.p : (row?.played || 0);
+                const points = row?.pts !== undefined ? row.pts : (row?.points || 0);
+                return Number(played) > 0 || Number(points) > 0;
+            });
+
+            // Hvis ingen i gruppen har spilt eller fått poeng ennå ("p": 0), hopper vi over gruppen!
+            if (!hasPlayedMatches) {
+                continue;
             }
             
-            // Gruppen er i gang! Vi kjører poengberegning
+            // Gruppen er i gang! Vi sammenligner plasseringene (idx 0 til 3)
             actualRows.forEach((actualRow, idx) => {
-                const actualTeam = actualRow.name;
+                // Henter ut navnet enten raden er et objekt { name: "..." } eller direkte fra API-feltet .team
+                const actualTeam = actualRow?.team || actualRow?.name || (typeof actualRow === "string" ? actualRow : "");
                 const userTeam = userOrder[idx];
                 
                 if (cleanText(userTeam) === cleanText(actualTeam) && cleanText(actualTeam) !== "") {
-                    score += 1; // 1 poeng for riktig plass
+                    score += 1; // 1 poeng for riktig lag på riktig plass (1–4)
                     
                     if (idx === 0) {
                         score += 2; // +2 poeng ekstra for riktig gruppevinner
