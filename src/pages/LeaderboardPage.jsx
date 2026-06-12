@@ -27,40 +27,40 @@ async function fetchExternalLiveData() {
         const standingsData = await standingsResponse.json();
         const bracketData = await bracketResponse.json();
 
-        // Enkel ordbok for å mappe gruppenummer til bokstav (Utvidet til 12 grupper for VM)
         const groupNumberToLetter = {
             "1": "A", "2": "B", "3": "C", "4": "D", 
             "5": "E", "6": "F", "7": "G", "8": "H", 
             "9": "I", "10": "J", "11": "K", "12": "L"
         };
 
-        // Del 1: Grupper -> Oversetter "Group 1" til "A" osv.
         const tables = Array.isArray(standingsData?.tables) ? standingsData.tables : [];
         const groups = tables
             .filter(table => String(table?.group || "").toLowerCase().startsWith("group "))
             .reduce((acc, g) => {
-                // Henter ut tallet fra "Group 1", "Group 2" osv.
                 const match = String(g.group || "").match(/\d+/);
                 const groupNumber = match ? match[0] : null;
                 const key = groupNumber ? groupNumberToLetter[groupNumber] : null;
                 
                 if (key && Array.isArray(g.rows)) {
+                    // Vi lagrer både navnet og hvor mange kamper laget har spilt totalt
                     acc[key] = g.rows.map(row => {
                         const v = row.team || row.club || row.participant || row;
-                        if (!v) return "";
-                        if (typeof v === "string") return v.trim();
-                        return String(v.name || v.team_name || v.title || "").trim();
+                        const teamName = typeof v === "string" ? v.trim() : String(v.name || v.team_name || v.title || "").trim();
+                        const playedMatches = row.played || row.matches || row.m || row.g || 0;
+                        
+                        return {
+                            name: teamName,
+                            played: Number(playedMatches)
+                        };
                     });
                 }
                 return acc;
             }, {});
 
-        // Del 3: Sluttspill
+        const knockout = { r32: [], r16: [], qf: [], sf: [], f: [] };
         const rounds = Array.isArray(bracketData?.rounds) ? bracketData.rounds : [];
         const actualBracketRound = rounds.find(r => r?.name === "match_ups" && Array.isArray(r?.matchups));
         
-        const knockout = { r32: [], r16: [], qf: [], sf: [], f: [] };
-
         if (actualBracketRound) {
             actualBracketRound.matchups.forEach((match, index) => {
                 const getTeamName = (teamObj) => {
@@ -68,7 +68,6 @@ async function fetchExternalLiveData() {
                     if (typeof teamObj === "string") return teamObj.trim();
                     return String(teamObj.name || teamObj.team_name || teamObj.title || "").trim();
                 };
-
                 const home = getTeamName(match?.home);
                 const away = getTeamName(match?.away);
                 
@@ -109,32 +108,50 @@ export default function LeaderboardPage() {
     const [loading, setLoading] = useState(true);
 
 // REGLER DEL 1: 1 poeng for riktig plass (1-4) + 2 poeng ekstra for riktig gruppevinner
-    const pointsPart1 = (participant, currentActual) => {
+const pointsPart1 = (participant, currentActual) => {
         if (!participant?.groups || !currentActual?.groups) return 0;
         let score = 0;
 
-        // Sikrer at små/store bokstaver eller mellomrom ikke ødelegger treff
-        const clean = (str) => String(str || "").trim().toLowerCase();
+        const cleanText = (str) => String(str || "").trim().toLowerCase();
 
-        // Gå gjennom hver gruppe (A, B, C osv.) fra API-et
-        for (const [groupLetter, actualOrder] of Object.entries(currentActual.groups)) {
-            const userOrder = participant.groups[groupLetter] || [];
+        const cleanGroupKey = (key) => {
+            const cleaned = String(key || "").trim().toUpperCase();
+            if (cleaned.startsWith("GRUPPE ")) return cleaned.replace("GRUPPE ", "");
+            return cleaned;
+        };
+
+        const userGroupsCleaned = {};
+        Object.entries(participant.groups).forEach(([key, value]) => {
+            userGroupsCleaned[cleanGroupKey(key)] = value;
+        });
+
+        for (const [groupLetter, actualRows] of Object.entries(currentActual.groups)) {
+            const cleanLetter = cleanGroupKey(groupLetter);
+            const userOrder = userGroupsCleaned[cleanLetter] || [];
             
-            // Sjekk de 4 plasseringene i gruppen
-            actualOrder.forEach((actualTeam, idx) => {
+            // SJEKK: Teller opp totalt antall spilte kamper i denne gruppen akkurat nå
+            const totalGroupMatchesPlayed = actualRows.reduce((sum, row) => sum + (row.played || 0), 0);
+            
+            // Hvis ingen av lagene i gruppen har spilt en eneste kamp ennå, hopper vi over!
+            if (totalGroupMatchesPlayed === 0) {
+                continue; 
+            }
+            
+            // Gruppen er i gang! Vi kjører poengberegning
+            actualRows.forEach((actualRow, idx) => {
+                const actualTeam = actualRow.name;
                 const userTeam = userOrder[idx];
                 
-                // Hvis lagene på denne tabellposisjonen matcher:
-                if (clean(userTeam) === clean(actualTeam) && clean(actualTeam) !== "") {
-                    score += 1; // 1 poeng for riktig lag på riktig plass (1–4)
+                if (cleanText(userTeam) === cleanText(actualTeam) && cleanText(actualTeam) !== "") {
+                    score += 1; // 1 poeng for riktig plass
                     
-                    // Hvis dette i tillegg er 1. plassen (indeks 0), gi 2 poeng ekstra
                     if (idx === 0) {
                         score += 2; // +2 poeng ekstra for riktig gruppevinner
                     }
                 }
             });
         }
+        
         return score;
     };
     
