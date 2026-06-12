@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
-
+import { API_BASE } from "../config";
 // ============================================================================
 // 1. KONSTANTER OG EKSTERNE URL-ER
 // ============================================================================
-const API_BASE = "../config"; // OBS: Sjekk at denne matcher din gamle verdi!
+// const API_BASE = "../config"; // OBS: Sjekk at denne matcher din gamle verdi!
 
 const STANDINGS_URL = "https://sportscore.com/api/widget/standings/?sport=football&slug=fifa-world-cup&src=vm2026-tipping";
 const BRACKET_URL = "https://sportscore.com/api/widget/bracket/?sport=football&slug=fifa-world-cup&src=vm2026-tipping";
