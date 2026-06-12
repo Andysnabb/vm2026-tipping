@@ -71,7 +71,7 @@ export default function Part2Page() {
     const [message, setMessage] = useState("");
 
     // SPERREDATO SETT TIL 11. JUNI 2026 KL. 21:05
-    const SPERRE_DATO = new Date("2026-06-11T21:05:00");
+    const SPERRE_DATO = new Date("2026-06-12T21:05:00");
     const nå = new Date();
     const erLåst = nå >= SPERRE_DATO;
 
