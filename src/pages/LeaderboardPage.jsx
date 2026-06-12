@@ -5,13 +5,13 @@ import React, { useState, useEffect, useMemo } from "react";
 // ============================================================================
 // 1. DINE KONSTANTER (Sjekk at API_BASE stemmer med din backend)
 // ============================================================================
-//const API_BASE = "https://DITT_BACKEND_DOMENE.no/api"; // <-- Legg inn din faktiske backend-URL her!
+// const API_BASE = "https://DITT_BACKEND_DOMENE.no/api"; // <-- Legg inn din faktiske backend-URL her!
 
 const STANDINGS_URL = "https://sportscore.com/api/widget/standings/?sport=football&slug=fifa-world-cup&src=vm2026-tipping";
 const BRACKET_URL = "https://sportscore.com/api/widget/bracket/?sport=football&slug=fifa-world-cup&src=vm2026-tipping";
 
 // ============================================================================
-// OPPDATERT HJELPEFUNKSJON: SIKRER AT TALL-GRUPPER (1, 2) BLIR TIL BOKSTAVER (A, B)
+// 2. HJELPEFUNKSJON FOR Å HENTE LIVE-DATA FRA EKSTERNE API-ER
 // ============================================================================
 async function fetchExternalLiveData() {
     try {
@@ -33,6 +33,7 @@ async function fetchExternalLiveData() {
             "9": "I", "10": "J", "11": "K", "12": "L"
         };
 
+        // Del 1: Grupper -> Tar vare på hele rad-objektet (inkludert .p for spilte kamper)
         const tables = Array.isArray(standingsData?.tables) ? standingsData.tables : [];
         const groups = tables
             .filter(table => String(table?.group || "").toLowerCase().startsWith("group "))
@@ -42,21 +43,13 @@ async function fetchExternalLiveData() {
                 const key = groupNumber ? groupNumberToLetter[groupNumber] : null;
                 
                 if (key && Array.isArray(g.rows)) {
-                    // Vi lagrer både navnet og hvor mange kamper laget har spilt totalt
-                    acc[key] = g.rows.map(row => {
-                        const v = row.team || row.club || row.participant || row;
-                        const teamName = typeof v === "string" ? v.trim() : String(v.name || v.team_name || v.title || "").trim();
-                        const playedMatches = row.played || row.matches || row.m || row.g || 0;
-                        
-                        return {
-                            name: teamName,
-                            played: Number(playedMatches)
-                        };
-                    });
+                    // Vi sender hele rad-objektet videre slik at poengberegningen kan lese .p og .team
+                    acc[key] = g.rows;
                 }
                 return acc;
             }, {});
 
+        // Del 3: Sluttspill
         const knockout = { r32: [], r16: [], qf: [], sf: [], f: [] };
         const rounds = Array.isArray(bracketData?.rounds) ? bracketData.rounds : [];
         const actualBracketRound = rounds.find(r => r?.name === "match_ups" && Array.isArray(r?.matchups));
@@ -107,8 +100,7 @@ export default function LeaderboardPage() {
     const [part2Actual, setPart2Actual] = useState({});
     const [loading, setLoading] = useState(true);
 
-// REGLER DEL 1: 1 poeng for riktig plass (1-4) + 2 poeng ekstra for riktig gruppevinner
-// DØNN SOLID UTGAVE BASERT PÅ API-ETS EGNE DATA ("p" = SPILTE KAMPER)
+    // POENGBEREGNING DEL 1 (Sjekker om kamper er spilt via .p)
     const pointsPart1 = (participant, currentActual) => {
         if (!participant?.groups || !currentActual?.groups) return 0;
         let score = 0;
@@ -130,27 +122,21 @@ export default function LeaderboardPage() {
             const cleanLetter = cleanGroupKey(groupLetter);
             const userOrder = userGroupsCleaned[cleanLetter] || [];
             
-            // SJEKK: Gå gjennom radene og se om NOEN av lagene har spilt kamper (p > 0)
-            const hasPlayedMatches = actualRows.some(row => {
-                // Sjekker både row.p (played) og row.pts (points) i tilfelle tallene tolkes ulikt
-                const played = row?.p !== undefined ? row.p : (row?.played || 0);
-                const points = row?.pts !== undefined ? row.pts : (row?.points || 0);
-                return Number(played) > 0 || Number(points) > 0;
-            });
+            // SJEKK: Har noen av lagene i gruppen spilt en kamp ennå? (.p > 0)
+            const hasPlayedMatches = actualRows.some(row => Number(row?.p || 0) > 0);
 
-            // Hvis ingen i gruppen har spilt eller fått poeng ennå ("p": 0), hopper vi over gruppen!
+            // Hvis ingen har spilt, hopper vi over gruppen fullstendig
             if (!hasPlayedMatches) {
                 continue;
             }
             
-            // Gruppen er i gang! Vi sammenligner plasseringene (idx 0 til 3)
+            // Gruppen er i gang! Vi sjekker plasseringene (idx 0 til 3)
             actualRows.forEach((actualRow, idx) => {
-                // Henter ut navnet enten raden er et objekt { name: "..." } eller direkte fra API-feltet .team
-                const actualTeam = actualRow?.team || actualRow?.name || (typeof actualRow === "string" ? actualRow : "");
+                const actualTeam = actualRow?.team || "";
                 const userTeam = userOrder[idx];
                 
                 if (cleanText(userTeam) === cleanText(actualTeam) && cleanText(actualTeam) !== "") {
-                    score += 1; // 1 poeng for riktig lag på riktig plass (1–4)
+                    score += 1; // 1 poeng for riktig plass
                     
                     if (idx === 0) {
                         score += 2; // +2 poeng ekstra for riktig gruppevinner
@@ -161,37 +147,11 @@ export default function LeaderboardPage() {
         
         return score;
     };
-    
-    const pointsPart2 = (participant, currentActual) => {
-        if (!participant?.part2 || !currentActual?.part2) return 0;
-        let score = 0;
-        // Går gjennom dine manuelt lagrede svar fra backenden (Toppscorer, gule kort osv.)
-        for (const [questionId, actualAnswer] of Object.entries(currentActual.part2)) {
-            if (String(participant.part2[questionId]).trim().toLowerCase() === String(actualAnswer).trim().toLowerCase()) {
-                score += 10; // Juster poengsum per riktig svar
-            }
-        }
-        return score;
-    };
-
-    const pointsPart3 = (participant, currentActual) => {
-        if (!participant?.knockout || !currentActual?.knockout) return 0;
-        let score = 0;
-        // Sjekker runder (r32, r16, qf, sf, f)
-        for (const [roundKey, actualTeams] of Object.entries(currentActual.knockout)) {
-            const userTeams = participant.knockout[roundKey] || [];
-            userTeams.forEach(team => {
-                if (actualTeams.includes(team)) score += 5; // Juster poeng per lag på rett nivå
-            });
-        }
-        return score;
-    };
 
     // FUNKSJON FOR Å LASTE ALT I EN OPERASJON
     async function loadLeaderboardData() {
         setLoading(true);
         try {
-            // Henter innsendte kuponger, backend-fasit (Del 2) og live-data (Del 1 + 3) samtidig
             const [submissionsRes, actualsRes, liveData] = await Promise.all([
                 fetch(`${API_BASE}?action=all`),
                 fetch(`${API_BASE}?action=actuals`).then(res => res.json()).catch(() => ({ ok: false, data: null })),
@@ -200,7 +160,6 @@ export default function LeaderboardPage() {
 
             const submissionsJson = await submissionsRes.json();
             
-            // Sjekk om backenden returnerer data direkte eller pakket inn i .data
             if (submissionsJson?.ok && Array.isArray(submissionsJson.data)) {
                 setData(submissionsJson.data);
             } else if (Array.isArray(submissionsJson)) {
@@ -212,7 +171,6 @@ export default function LeaderboardPage() {
             const srv = actualsRes?.ok && actualsRes?.data ? actualsRes.data : null;
             setServerActual(srv);
 
-            // Flett alt sammen i staten som beregningene bruker
             const combinedActual = {
                 groups: liveData.groups || {},
                 part2: srv?.part2 || {},
@@ -233,26 +191,22 @@ export default function LeaderboardPage() {
         loadLeaderboardData();
     }, []);
 
-// REKALKULER DELPOENG OG TOTALT MED RIGTIG JSON-PARSING
+    // REKALKULER DELPOENG OG TOTALT MED JSON-PARSING
     const sortedLeaderboard = useMemo(() => {
         return [...data].map(participant => {
-            // 1. Dekod den lagrede JSON-strengen for Del 1, akkurat som på visningssiden din
             let parsedPart1 = null;
             try {
                 if (participant.part1Json) {
                     parsedPart1 = JSON.parse(participant.part1Json);
                 }
             } catch (e) {
-                console.error("Kunne ikke parse part1Json for", participant.name, e);
+                console.error("Kunne ikke parse part1Json", e);
             }
 
-            // 2. Send det DEKODEDE objektet inn til poengberegningen i stedet for rådataene
+            // Regner ut del 1 basert på det dekodede objektet
             const p1 = pointsPart1(parsedPart1, actual);
-            
-            // Del 2 og Del 3 (Disse kan vi koble på på samme måte når JSON-strukturen der er klar)
-            const p2 = typeof pointsPart2 === "function" ? pointsPart2(participant, actual) : 0;
-            const p3 = typeof pointsPart3 === "function" ? pointsPart3(participant, actual) : 0;
-            
+            const p2 = 0; // Kobles på senere
+            const p3 = 0; // Kobles på senere
             const total = p1 + p2 + p3;
 
             return {
@@ -269,9 +223,6 @@ export default function LeaderboardPage() {
         return <div style={styles.centerMessage}>Oppdaterer ledertavle med live-resultater...</div>;
     }
 
-    // ============================================================================
-    // 4. UI RENDER MED ALLE KOLONNER (Del 1, Del 2, Del 3 og Totalt)
-    // ============================================================================
     return (
         <div style={styles.page}>
             <div style={styles.header}>
@@ -322,7 +273,7 @@ export default function LeaderboardPage() {
 }
 
 // ============================================================================
-// 5. MOBILVENNLIG STYLING FOR MANGE KOLONNER
+// 5. STYLING
 // ============================================================================
 const styles = {
     page: { padding: "12px", maxWidth: "800px", margin: "0 auto", fontFamily: "sans-serif" },
