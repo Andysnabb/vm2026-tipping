@@ -69,13 +69,11 @@ function readLocalActual() {
 function buildActual(serverActual = null) { 
     const { storedPart2, storedLive } = readLocalActual(); 
     return { 
-        // Vi må sørge for at serverActual (som inneholder live-data fra getActuals()) 
-        // eller storedLive (lokal live-kilde) har prioritet over de tomme malene.
         groups: { ...(ACTUAL.groups || {}), ...(serverActual?.groups || {}), ...(storedLive?.groups || {}) }, 
         part2: { ...(ACTUAL.part2 || {}), ...(storedPart2 || {}), ...(serverActual?.part2 || {}), ...(storedLive?.part2 || {}) }, 
         knockout: { ...(ACTUAL.knockout || {}), ...(serverActual?.knockout || {}), ...(storedLive?.knockout || {}) } 
     }; 
-}
+} 
 
 function pointsPart1(row, actual) { 
     const part1 = safeJsonParse(row.part1Json, { groups: {} }); 
@@ -116,7 +114,7 @@ function pointsPart3(row, actual) {
     let points = 0; 
 
     const predictedRoundOf32 = Array.isArray(part3.roundOf32) ? part3.roundOf32.map(normalizeTeam).filter(Boolean) : []; 
-    const predictedRoundOf16 = Array.isArray(part3.roundOf16) ? part3.roundOf16.map(normalizeTeam).filter(Boolean) : []; 
+    const MathpredictedRoundOf16 = Array.isArray(part3.roundOf16) ? part3.roundOf16.map(normalizeTeam).filter(Boolean) : []; 
     const predictedQuarterfinals = Array.isArray(part3.quarterfinals) ? part3.quarterfinals.map(normalizeTeam).filter(Boolean) : []; 
 
     const actualRoundOf32 = Array.isArray(actual.knockout?.roundOf32) ? actual.knockout.roundOf32.map(normalizeTeam).filter(Boolean) : []; 
@@ -124,7 +122,7 @@ function pointsPart3(row, actual) {
     const actualQuarterfinals = Array.isArray(actual.knockout?.quarterfinals) ? actual.knockout.quarterfinals.map(normalizeTeam).filter(Boolean) : []; 
 
     predictedRoundOf32.forEach(t => { if (actualRoundOf32.includes(t)) points += 1; }); 
-    predictedRoundOf16.forEach(t => { if (actualRoundOf16.includes(t)) points += 2; }); 
+    MathpredictedRoundOf16.forEach(t => { if (actualRoundOf16.includes(t)) points += 2; }); 
     predictedQuarterfinals.forEach(t => { if (actualQuarterfinals.includes(t)) points += 3; }); 
 
     const getPredictedChampion = p => normalizeTeam(p?.final?.[0]); 
@@ -340,7 +338,7 @@ export default function LeaderboardPage() {
                         <div> 
                             <div style={{ marginBottom: 8, fontWeight: "bold" }}>Admin-passord:</div> 
                             <input 
-                                type="password"
+                                type="password" 
                                 value={adminPassword} 
                                 onChange={(e) => setAdminPassword(e.target.value)} 
                                 style={{ padding: 8, marginBottom: 8, display: "block", borderRadius: 4, border: "1px solid #ccc" }} 
@@ -356,7 +354,7 @@ export default function LeaderboardPage() {
                                         } 
                                     }} 
                                     disabled={!adminPassword} 
-                                    style={{ padding: "6px 12px" }}
+                                    style={{ padding: "6px 12px" }} 
                                 > 
                                     Logg inn 
                                 </button> 
@@ -373,7 +371,7 @@ export default function LeaderboardPage() {
                                         setAdminPassword(""); 
                                         setAdminMessage(""); 
                                     }} 
-                                    style={{ padding: "4px 8px" }}
+                                    style={{ padding: "4px 8px" }} 
                                 > 
                                     Logg ut 
                                 </button> 
