@@ -99,19 +99,30 @@ export default function LeaderboardPage() {
     const [part2Actual, setPart2Actual] = useState({});
     const [loading, setLoading] = useState(true);
 
-    // DINE ORIGINALE POENGBEREGNINGSFUNKSJONER (Sørg for at disse matcher dine regler)
+// REN UTGAVE FOR Å SJEKKE PROBLEM 2 (STRIPPER TEKST OG SAMMENLIGNER)
     const pointsPart1 = (participant, currentActual) => {
         if (!participant?.groups || !currentActual?.groups) return 0;
         let score = 0;
+
+        // Hjelpefunksjon for å fjerne ulikheter i store/små bokstaver og mellomrom
+        const clean = (str) => String(str || "").trim().toLowerCase();
+
+        // Looper gjennom grupper (A, B, C osv) fra live-API-et
         for (const [groupLetter, actualOrder] of Object.entries(currentActual.groups)) {
             const userOrder = participant.groups[groupLetter] || [];
-            actualOrder.forEach((team, idx) => {
-                if (userOrder[idx] === team) score += 4; // Juster poengsum per treff
+            
+            // Sjekker om lagene ligger på NØYAKTIG samme plass i tabellen akkurat nå
+            actualOrder.forEach((actualTeam, idx) => {
+                const userTeam = userOrder[idx];
+                
+                if (clean(userTeam) === clean(actualTeam) && clean(actualTeam) !== "") {
+                    score += 4; // 4 poeng per lag på nøyaktig rett plass
+                }
             });
         }
         return score;
     };
-
+    
     const pointsPart2 = (participant, currentActual) => {
         if (!participant?.part2 || !currentActual?.part2) return 0;
         let score = 0;
