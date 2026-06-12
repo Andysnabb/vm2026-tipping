@@ -209,12 +209,26 @@ export default function LeaderboardPage() {
         loadLeaderboardData();
     }, []);
 
-    // KALKULER DELPOENG OG TOTALT, OG SORTER TABELLEN
+// REKALKULER DELPOENG OG TOTALT MED RIGTIG JSON-PARSING
     const sortedLeaderboard = useMemo(() => {
         return [...data].map(participant => {
-            const p1 = pointsPart1(participant, actual);
-            const p2 = pointsPart2(participant, actual);
-            const p3 = pointsPart3(participant, actual);
+            // 1. Dekod den lagrede JSON-strengen for Del 1, akkurat som på visningssiden din
+            let parsedPart1 = null;
+            try {
+                if (participant.part1Json) {
+                    parsedPart1 = JSON.parse(participant.part1Json);
+                }
+            } catch (e) {
+                console.error("Kunne ikke parse part1Json for", participant.name, e);
+            }
+
+            // 2. Send det DEKODEDE objektet inn til poengberegningen i stedet for rådataene
+            const p1 = pointsPart1(parsedPart1, actual);
+            
+            // Del 2 og Del 3 (Disse kan vi koble på på samme måte når JSON-strukturen der er klar)
+            const p2 = typeof pointsPart2 === "function" ? pointsPart2(participant, actual) : 0;
+            const p3 = typeof pointsPart3 === "function" ? pointsPart3(participant, actual) : 0;
+            
             const total = p1 + p2 + p3;
 
             return {
