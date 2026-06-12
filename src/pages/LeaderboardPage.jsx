@@ -29,7 +29,6 @@ const TEAMS = [
 const TOTAL_GOALS_OPTIONS = ["250 el. færre", "251-275", "276-305", "306-330", "331 el. flere"]; 
 const HUB_OPTIONS = ["H", "U", "B"]; 
 
-// Hjelpefunksjon for å hente live-data fra Sportscore
 async function fetchExternalLiveData() {
     try {
         const [standingsResponse, bracketResponse] = await Promise.all([
@@ -335,29 +334,111 @@ export default function LeaderboardPage() {
                                 <button onClick={() => { setAdminAuthenticated(false); setAdminPassword(""); }} style={{ padding: "4px 8px" }}>Logg ut</button> 
                             </div> 
 
-                            <h3 style={{ marginTop: 0 }}>Fasit del 2</h3> 
+                            <h3 style={{ marginTop: 0, marginBottom: 12 }}>Fasit del 2</h3> 
                             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}> 
-                                <label>
-                                    <div style={{ fontSize: 12, fontWeight: "bold" }}>Toppscorer (q1)</div>
+                                
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Toppscorer (q1)</div>
                                     <select value={part2Actual.q1 || ""} onChange={(e) => updatePart2Field("q1", e.target.value)} style={{ width: "100%", padding: 6 }}>
                                         <option value="">Velg</option>
                                         {SCORERS.map(v => <option key={v} value={v}>{v}</option>)}
                                     </select>
                                 </label>
 
-                                <label>
-                                    <div style={{ fontSize: 12, fontWeight: "bold" }}>Mestscorende lag (q3)</div>
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Antall mål for toppscorer (q2)</div>
+                                    <input type="number" min={0} value={part2Actual.q2 || ""} onChange={(e) => updatePart2Field("q2", e.target.value)} style={{ width: "100%", padding: 5 }} />
+                                </label>
+
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Mestscorende lag (q3)</div>
                                     <select value={part2Actual.q3 || ""} onChange={(e) => updatePart2Field("q3", e.target.value)} style={{ width: "100%", padding: 6 }}>
                                         <option value="">Velg</option>
                                         {TEAMS.map(v => <option key={v} value={v}>{v}</option>)}
                                     </select>
                                 </label>
-                                
-                                {/* Du kan fylle på med de andre inputfeltene her om ønskelig */}
+
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Flest mål imot (q4)</div>
+                                    <select value={part2Actual.q4 || ""} onChange={(e) => updatePart2Field("q4", e.target.value)} style={{ width: "100%", padding: 6 }}>
+                                        <option value="">Velg</option>
+                                        {TEAMS.map(v => <option key={v} value={v}>{v}</option>)}
+                                    </select>
+                                </label>
+
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Antall mål i finalen (q5)</div>
+                                    <input type="number" min={0} value={part2Actual.q5 || ""} onChange={(e) => updatePart2Field("q5", e.target.value)} style={{ width: "100%", padding: 5 }} />
+                                </label>
+
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Totalt antall mål i VM (q6)</div>
+                                    <select value={part2Actual.q6 || ""} onChange={(e) => updatePart2Field("q6", e.target.value)} style={{ width: "100%", padding: 6 }}>
+                                        <option value="">Velg</option>
+                                        {TOTAL_GOALS_OPTIONS.map(v => <option key={v} value={v}>{v}</option>)}
+                                    </select>
+                                </label>
+
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Hvem gjør det best, GER el. FRA? (q7)</div>
+                                    <select value={part2Actual.q7 || ""} onChange={(e) => updatePart2Field("q7", e.target.value)} style={{ width: "100%", padding: 6 }}>
+                                        <option value="">Velg</option>
+                                        <option value="Tyskland">Tyskland</option>
+                                        <option value="Frankrike">Frankrike</option>
+                                    </select>
+                                </label>
+
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Flest gule kort (q8)</div>
+                                    <select value={part2Actual.q8 || ""} onChange={(e) => updatePart2Field("q8", e.target.value)} style={{ width: "100%", padding: 6 }}>
+                                        <option value="">Velg</option>
+                                        {TEAMS.map(v => <option key={v} value={v}>{v}</option>)}
+                                    </select>
+                                </label>
+
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Første røde kort i turneringen (q9)</div>
+                                    <select value={part2Actual.q9 || ""} onChange={(e) => updatePart2Field("q9", e.target.value)} style={{ width: "100%", padding: 6 }}>
+                                        <option value="">Velg</option>
+                                        {TEAMS.map(v => <option key={v} value={v}>{v}</option>)}
+                                    </select>
+                                </label>
+
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Resultat Brasil - Haiti (q10)</div>
+                                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                                        <input type="number" placeholder="BRA" min={0} value={part2Actual.q10_brazil || ""} onChange={(e) => updatePart2Field("q10_brazil", e.target.value)} style={{ width: "100%", padding: 5 }} />
+                                        <span>-</span>
+                                        <input type="number" placeholder="HAI" min={0} value={part2Actual.q10_haiti || ""} onChange={(e) => updatePart2Field("q10_haiti", e.target.value)} style={{ width: "100%", padding: 5 }} />
+                                    </div>
+                                </label>
+
+                                {/* Kamper seksjon */}
+                                <div style={{ gridColumn: "1 / -1", marginTop: 8, padding: 10, border: "1px solid #ddd", borderRadius: 6, backgroundColor: "#fff" }}>
+                                    <div style={{ fontSize: 13, fontWeight: "bold", marginBottom: 8, color: "#374151" }}>Kampresultater (m1, m2, m3)</div>
+                                    {[
+                                        { key: "m1", label: "Kroatia - England" },
+                                        { key: "m2", label: "Tyskland - Elfenbenskysten" },
+                                        { key: "m3", label: "Uruguay - Spania" }
+                                    ].map((m) => (
+                                        <div key={m.key} style={{ marginBottom: 8, paddingBottom: 6, borderBottom: "1px dashed #eee", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                            <div style={{ fontSize: 13, fontWeight: "500" }}>{m.label}</div>
+                                            <div style={{ display: "flex", gap: 14 }}>
+                                                {HUB_OPTIONS.map((opt) => (
+                                                    <label key={opt} style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer", fontSize: 13 }}>
+                                                        <input type="radio" name={m.key} checked={part2Actual[m.key] === opt} onChange={() => updatePart2Field(m.key, opt)} />
+                                                        <span>{opt}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
                             </div> 
 
                             <div style={{ marginTop: 16 }}> 
-                                <button onClick={handleSaveActual} style={{ padding: "8px 16px", fontWeight: "bold" }}> 
+                                <button onClick={handleSaveActual} style={{ padding: "8px 16px", fontWeight: "bold", cursor: "pointer" }}> 
                                     Lagre fasit på server 
                                 </button> 
                             </div> 
