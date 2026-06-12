@@ -99,24 +99,30 @@ export default function LeaderboardPage() {
     const [part2Actual, setPart2Actual] = useState({});
     const [loading, setLoading] = useState(true);
 
-// REN UTGAVE FOR Å SJEKKE PROBLEM 2 (STRIPPER TEKST OG SAMMENLIGNER)
+// REGLER DEL 1: 1 poeng for riktig plass (1-4) + 2 poeng ekstra for riktig gruppevinner
     const pointsPart1 = (participant, currentActual) => {
         if (!participant?.groups || !currentActual?.groups) return 0;
         let score = 0;
 
-        // Hjelpefunksjon for å fjerne ulikheter i store/små bokstaver og mellomrom
+        // Sikrer at små/store bokstaver eller mellomrom ikke ødelegger treff
         const clean = (str) => String(str || "").trim().toLowerCase();
 
-        // Looper gjennom grupper (A, B, C osv) fra live-API-et
+        // Gå gjennom hver gruppe (A, B, C osv.) fra API-et
         for (const [groupLetter, actualOrder] of Object.entries(currentActual.groups)) {
             const userOrder = participant.groups[groupLetter] || [];
             
-            // Sjekker om lagene ligger på NØYAKTIG samme plass i tabellen akkurat nå
+            // Sjekk de 4 plasseringene i gruppen
             actualOrder.forEach((actualTeam, idx) => {
                 const userTeam = userOrder[idx];
                 
+                // Hvis lagene på denne tabellposisjonen matcher:
                 if (clean(userTeam) === clean(actualTeam) && clean(actualTeam) !== "") {
-                    score += 4; // 4 poeng per lag på nøyaktig rett plass
+                    score += 1; // 1 poeng for riktig lag på riktig plass (1–4)
+                    
+                    // Hvis dette i tillegg er 1. plassen (indeks 0), gi 2 poeng ekstra
+                    if (idx === 0) {
+                        score += 2; // +2 poeng ekstra for riktig gruppevinner
+                    }
                 }
             });
         }
