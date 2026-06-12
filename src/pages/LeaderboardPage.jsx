@@ -1,22 +1,17 @@
-import React, { useState, useEffect, useMemo } from "react";
+
 import { API_BASE } from "../config";
+import React, { useState, useEffect, useMemo } from "react";
+
 // ============================================================================
-// 1. KONSTANTER OG EKSTERNE URL-ER
+// 1. DINE KONSTANTER (Sjekk at API_BASE stemmer med din backend)
 // ============================================================================
-// const API_BASE = "../config"; // OBS: Sjekk at denne matcher din gamle verdi!
+//const API_BASE = "https://DITT_BACKEND_DOMENE.no/api"; // <-- Legg inn din faktiske backend-URL her!
 
 const STANDINGS_URL = "https://sportscore.com/api/widget/standings/?sport=football&slug=fifa-world-cup&src=vm2026-tipping";
 const BRACKET_URL = "https://sportscore.com/api/widget/bracket/?sport=football&slug=fifa-world-cup&src=vm2026-tipping";
 
-// Fallback/standard-objekt hvis alt feiler
-const ACTUAL_DEFAULT = {
-    groups: {},
-    part2: {},
-    knockout: { r32: [], r16: [], qf: [], sf: [], f: [] }
-};
-
 // ============================================================================
-// 2. HJELPEFUNKSJON FOR Å HENTE LIVE-DATA (DEL 1 OG DEL 3) FRA SPORTBOARDS
+// 2. GJENBRUKBAR HENTING AV LIVE-DATA FRA EKSTERNE API-ER
 // ============================================================================
 async function fetchExternalLiveData() {
     try {
@@ -25,13 +20,14 @@ async function fetchExternalLiveData() {
             fetch(BRACKET_URL)
         ]);
 
-        if (!standingsResponse.ok) throw new Error(`Standings API feilet: ${standingsResponse.status}`);
-        if (!bracketResponse.ok) throw new Error(`Bracket API feilet: ${bracketResponse.status}`);
+        if (!standingsResponse.ok || !bracketResponse.ok) {
+            throw new Error("Kunne ikke hente live-data fra Sportscore");
+        }
 
         const standingsData = await standingsResponse.json();
         const bracketData = await bracketResponse.json();
 
-        // Formater Del 1 (Grupper) -> { A: ["Lag 1", "Lag 2", ...], B: [...] }
+        // Del 1: Grupper -> { A: ["Lag 1", "Lag 2", ...], B: [...] }
         const tables = Array.isArray(standingsData?.tables) ? standingsData.tables : [];
         const groups = tables
             .filter(table => String(table?.group || "").toLowerCase().startsWith("group "))
@@ -50,7 +46,7 @@ async function fetchExternalLiveData() {
                 return acc;
             }, {});
 
-        // Formater Del 3 (Sluttspill) ut fra bracket-kampene
+        // Del 3: Sluttspill (Nøkler må matche det poengfunksjonen din for del 3 leter etter)
         const rounds = Array.isArray(bracketData?.rounds) ? bracketData.rounds : [];
         const actualBracketRound = rounds.find(r => r?.name === "match_ups" && Array.isArray(r?.matchups));
         
@@ -88,74 +84,85 @@ async function fetchExternalLiveData() {
 
         return { groups, knockout };
     } catch (err) {
-        console.error("Feil under parsing av eksterne live-data:", err);
-        return { groups: {}, knockout: { r32: [], r16: [], qf: [], sf: [], f: [] } };
-    }
-}
-
-// Dummy-funksjon i tilfelle du kaller getActuals() i koden din
-async function getActuals() {
-    try {
-        const res = await fetch(`${API_BASE}?action=actuals`);
-        return await res.json();
-    } catch (e) {
-        return { ok: false, data: null };
+        console.error("Feil ved henting av eksterne live-data:", err);
+        return { groups: {}, knockout: {} };
     }
 }
 
 // ============================================================================
-// 3. HOVEDKOMPONENTEN: LEADERBOARDPAGE
+// 3. HOVEDKOMPONENTEN
 // ============================================================================
 export default function LeaderboardPage() {
     const [data, setData] = useState([]);
-    const [actual, setActual] = useState(ACTUAL_DEFAULT);
+    const [actual, setActual] = useState({ groups: {}, part2: {}, knockout: {} });
     const [serverActual, setServerActual] = useState(null);
     const [part2Actual, setPart2Actual] = useState({});
     const [loading, setLoading] = useState(true);
 
-    // Poengberegningsfunksjon for Del 1 (Lagt inn lokalt for sikkerhetsskyld)
+    // DINE ORIGINALE POENGBEREGNINGSFUNKSJONER (Sørg for at disse matcher dine regler)
     const pointsPart1 = (participant, currentActual) => {
-        let score = 0;
         if (!participant?.groups || !currentActual?.groups) return 0;
-        
-        // Looper gjennom grupper (A, B, C osv)
+        let score = 0;
         for (const [groupLetter, actualOrder] of Object.entries(currentActual.groups)) {
             const userOrder = participant.groups[groupLetter] || [];
-            // Enkel sjekk: gir poeng per lag som ligger på nøyaktig rett plass
             actualOrder.forEach((team, idx) => {
-                if (userOrder[idx] === team) {
-                    score += 4; // Endre poengsum per treff her om nødvendig
-                }
+                if (userOrder[idx] === team) score += 4; // Juster poengsum per treff
             });
         }
         return score;
     };
 
-    // Hovedfunksjon for å laste og synkronisere data
+    const pointsPart2 = (participant, currentActual) => {
+        if (!participant?.part2 || !currentActual?.part2) return 0;
+        let score = 0;
+        // Går gjennom dine manuelt lagrede svar fra backenden (Toppscorer, gule kort osv.)
+        for (const [questionId, actualAnswer] of Object.entries(currentActual.part2)) {
+            if (String(participant.part2[questionId]).trim().toLowerCase() === String(actualAnswer).trim().toLowerCase()) {
+                score += 10; // Juster poengsum per riktig svar
+            }
+        }
+        return score;
+    };
+
+    const pointsPart3 = (participant, currentActual) => {
+        if (!participant?.knockout || !currentActual?.knockout) return 0;
+        let score = 0;
+        // Sjekker runder (r32, r16, qf, sf, f)
+        for (const [roundKey, actualTeams] of Object.entries(currentActual.knockout)) {
+            const userTeams = participant.knockout[roundKey] || [];
+            userTeams.forEach(team => {
+                if (actualTeams.includes(team)) score += 5; // Juster poeng per lag på rett nivå
+            });
+        }
+        return score;
+    };
+
+    // FUNKSJON FOR Å LASTE ALT I EN OPERASJON
     async function loadLeaderboardData() {
         setLoading(true);
         try {
+            // Henter innsendte kuponger, backend-fasit (Del 2) og live-data (Del 1 + 3) samtidig
             const [submissionsRes, actualsRes, liveData] = await Promise.all([
                 fetch(`${API_BASE}?action=all`),
-                getActuals(),
+                fetch(`${API_BASE}?action=actuals`).then(res => res.json()).catch(() => ({ ok: false, data: null })),
                 fetchExternalLiveData()
             ]);
 
-            // Håndter deltakernes kuponger
             const submissionsJson = await submissionsRes.json();
-            let participantsData = [];
-            if (submissionsJson?.ok) {
-                participantsData = Array.isArray(submissionsJson.data) ? submissionsJson.data : [];
-                setData(participantsData);
+            
+            // Sjekk om backenden returnerer data direkte eller pakket inn i .data
+            if (submissionsJson?.ok && Array.isArray(submissionsJson.data)) {
+                setData(submissionsJson.data);
+            } else if (Array.isArray(submissionsJson)) {
+                setData(submissionsJson);
             } else {
                 setData([]);
             }
 
-            // Håndter backend-fasit (Del 2)
             const srv = actualsRes?.ok && actualsRes?.data ? actualsRes.data : null;
             setServerActual(srv);
 
-            // Flett sammen live-data fra API og dine egne manuelt lagrede Del 2-data
+            // Flett alt sammen i staten som beregningene bruker
             const combinedActual = {
                 groups: liveData.groups || {},
                 part2: srv?.part2 || {},
@@ -165,46 +172,51 @@ export default function LeaderboardPage() {
             setActual(combinedActual);
             setPart2Actual(srv?.part2 || {});
 
-            // DEBUG-LOGG (Sjekk denne på en PC når du kan for å se om lagnavnene matcher)
-            console.log("=== LIVE SYNKRONISERING AKTIV ===");
-            console.log("Generert fasit-objekt:", combinedActual);
-
         } catch (error) {
-            console.error("Kritisk feil ved lasting av ledertavle:", error);
-            setActual(ACTUAL_DEFAULT);
+            console.error("Feil ved oppdatering av ledertavle:", error);
         } finally {
             setLoading(false);
         }
     }
 
-    // Kjør datalasting automatisk når komponenten mounter (siden åpnes)
     useEffect(() => {
         loadLeaderboardData();
     }, []);
 
-    // Sorter deltakerne basert på poengsummen deres (Del 1 i dette eksempelet)
+    // KALKULER DELPOENG OG TOTALT, OG SORTER TABELLEN
     const sortedLeaderboard = useMemo(() => {
         return [...data].map(participant => {
             const p1 = pointsPart1(participant, actual);
-            // Legg til p2 og p3 her hvis du har de funksjonene klare
-            const total = p1; 
-            return { ...participant, points: total };
-        }).sort((a, b) => b.points - a.points);
+            const p2 = pointsPart2(participant, actual);
+            const p3 = pointsPart3(participant, actual);
+            const total = p1 + p2 + p3;
+
+            return {
+                ...participant,
+                p1,
+                p2,
+                p3,
+                total
+            };
+        }).sort((a, b) => b.total - a.total);
     }, [data, actual]);
 
-    // ============================================================================
-    // 4. UI RENDER (Visning på skjerm)
-    // ============================================================================
     if (loading) {
-        return <div style={styles.centerMessage}>Oppdaterer tabeller og poengsummer live...</div>;
+        return <div style={styles.centerMessage}>Oppdaterer ledertavle med live-resultater...</div>;
     }
 
+    // ============================================================================
+    // 4. UI RENDER MED ALLE KOLONNER (Del 1, Del 2, Del 3 og Totalt)
+    // ============================================================================
     return (
         <div style={styles.page}>
             <div style={styles.header}>
-                <h1 style={styles.title}>Ledertavle</h1>
+                <div>
+                    <h1 style={styles.title}>Ledertavle</h1>
+                    <div style={styles.subtitle}>Oppdateres automatisk mot livedata</div>
+                </div>
                 <button onClick={loadLeaderboardData} style={styles.refreshButton}>
-                    Oppdater data
+                    Oppdater
                 </button>
             </div>
 
@@ -212,19 +224,32 @@ export default function LeaderboardPage() {
                 <table style={styles.table}>
                     <thead>
                         <tr>
-                            <th style={styles.th}>Pos</th>
+                            <th style={{ ...styles.th, width: "40px", textAlign: "center" }}>Pos</th>
                             <th style={styles.th}>Navn</th>
-                            <th style={styles.thTotal}>Totalt</th>
+                            <th style={{ ...styles.th, textAlign: "center" }}>Del 1</th>
+                            <th style={{ ...styles.th, textAlign: "center" }}>Del 2</th>
+                            <th style={{ ...styles.th, textAlign: "center" }}>Del 3</th>
+                            <th style={{ ...styles.thTotal, width: "70px" }}>Totalt</th>
                         </tr>
                     </thead>
                     <tbody>
                         {sortedLeaderboard.map((player, index) => (
                             <tr key={player.id || index} style={index % 2 === 0 ? styles.trEven : styles.trOdd}>
                                 <td style={styles.tdCenter}>{index + 1}</td>
-                                <td style={styles.tdName}>{player.name || "Ukjent deltaker"}</td>
-                                <td style={styles.tdPoints}>{player.points} p</td>
+                                <td style={styles.tdName}>{player.name || player.username || "Ukjent"}</td>
+                                <td style={styles.tdScoreCenter}>{player.p1} p</td>
+                                <td style={styles.tdScoreCenter}>{player.p2} p</td>
+                                <td style={styles.tdScoreCenter}>{player.p3} p</td>
+                                <td style={styles.tdPoints}>{player.total} p</td>
                             </tr>
                         ))}
+                        {sortedLeaderboard.length === 0 && (
+                            <tr>
+                                <td colSpan="6" style={{ ...styles.tdCenter, padding: "24px" }}>
+                                    Ingen deltakere funnet. Sjekk API-tilkoblingen din.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
@@ -233,21 +258,23 @@ export default function LeaderboardPage() {
 }
 
 // ============================================================================
-// 5. STYLES (Enkel, mobilvennlig styling)
+// 5. MOBILVENNLIG STYLING FOR MANGE KOLONNER
 // ============================================================================
 const styles = {
-    page: { padding: "16px", maxWidth: "600px", margin: "0 auto", fontFamily: "sans-serif" },
-    header: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" },
-    title: { fontSize: "24px", margin: 0, fontWeight: "bold" },
-    refreshButton: { padding: "8px 12px", backgroundColor: "#0070f3", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "14px" },
-    centerMessage: { padding: "40px", textAlign: "center", color: "#666", fontFamily: "sans-serif" },
-    tableWrapper: { border: "1px solid #e5e7eb", borderRadius: "8px", overflow: "hidden", backgroundColor: "#fff" },
-    table: { width: "100%", borderCollapse: "collapse", fontSize: "15px" },
-    th: { backgroundColor: "#f9fafb", padding: "12px", textTransform: "uppercase", fontSize: "12px", color: "#6b7280", textAlign: "left", borderBottom: "1px solid #e5e7eb" },
-    thTotal: { backgroundColor: "#f9fafb", padding: "12px", textTransform: "uppercase", fontSize: "12px", color: "#6b7280", textAlign: "right", borderBottom: "1px solid #e5e7eb" },
-    trEven: { backgroundColor: "#fff", borderBottom: "1px solid #f3f4f6" },
-    trOdd: { backgroundColor: "#fafafa", borderBottom: "1px solid #f3f4f6" },
-    tdCenter: { padding: "12px", textAlign: "center", width: "40px", color: "#6b7280" },
-    tdName: { padding: "12px", fontWeight: "600" },
-    tdPoints: { padding: "12px", textAlign: "right", fontWeight: "bold", color: "#10b981" }
+    page: { padding: "12px", maxWidth: "800px", margin: "0 auto", fontFamily: "sans-serif" },
+    header: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" },
+    title: { fontSize: "22px", margin: 0, fontWeight: "bold", color: "#111827" },
+    subtitle: { fontSize: "12px", color: "#6b7280", marginTop: "4px" },
+    refreshButton: { padding: "6px 12px", backgroundColor: "#1f2937", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: "600" },
+    centerMessage: { padding: "40px", textAlign: "center", color: "#6b7280", fontFamily: "sans-serif", fontSize: "14px" },
+    tableWrapper: { border: "1px solid #e5e7eb", borderRadius: "8px", overflowX: "auto", backgroundColor: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,0.05)" },
+    table: { width: "100%", borderCollapse: "collapse", fontSize: "14px", minWidth: "500px" },
+    th: { backgroundColor: "#f9fafb", padding: "10px 8px", textTransform: "uppercase", fontSize: "11px", fontWeight: "700", color: "#4b5563", textAlign: "left", borderBottom: "1px solid #e5e7eb" },
+    thTotal: { backgroundColor: "#f9fafb", padding: "10px 8px", textTransform: "uppercase", fontSize: "11px", fontWeight: "700", color: "#111827", textAlign: "right", borderBottom: "1px solid #e5e7eb" },
+    trEven: { backgroundColor: "#fff", borderBottom: "1px solid #e5e7eb" },
+    trOdd: { backgroundColor: "#fafafa", borderBottom: "1px solid #e5e7eb" },
+    tdCenter: { padding: "10px 8px", textAlign: "center", color: "#6b7280" },
+    tdScoreCenter: { padding: "10px 8px", textAlign: "center", color: "#4b5563", fontVariantNumeric: "tabular-nums" },
+    tdName: { padding: "10px 8px", fontWeight: "600", color: "#111827", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
+    tdPoints: { padding: "10px 8px", textAlign: "right", fontWeight: "700", color: "#059669", fontVariantNumeric: "tabular-nums" }
 };
