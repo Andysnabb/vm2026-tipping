@@ -11,7 +11,7 @@ const STANDINGS_URL = "https://sportscore.com/api/widget/standings/?sport=footba
 const BRACKET_URL = "https://sportscore.com/api/widget/bracket/?sport=football&slug=fifa-world-cup&src=vm2026-tipping";
 
 // ============================================================================
-// 2. GJENBRUKBAR HENTING AV LIVE-DATA FRA EKSTERNE API-ER
+// OPPDATERT HJELPEFUNKSJON: SIKRER AT TALL-GRUPPER (1, 2) BLIR TIL BOKSTAVER (A, B)
 // ============================================================================
 async function fetchExternalLiveData() {
     try {
@@ -27,13 +27,22 @@ async function fetchExternalLiveData() {
         const standingsData = await standingsResponse.json();
         const bracketData = await bracketResponse.json();
 
-        // Del 1: Grupper -> { A: ["Lag 1", "Lag 2", ...], B: [...] }
+        // Enkel ordbok for å mappe gruppenummer til bokstav (Utvidet til 12 grupper for VM)
+        const groupNumberToLetter = {
+            "1": "A", "2": "B", "3": "C", "4": "D", 
+            "5": "E", "6": "F", "7": "G", "8": "H", 
+            "9": "I", "10": "J", "11": "K", "12": "L"
+        };
+
+        // Del 1: Grupper -> Oversetter "Group 1" til "A" osv.
         const tables = Array.isArray(standingsData?.tables) ? standingsData.tables : [];
         const groups = tables
             .filter(table => String(table?.group || "").toLowerCase().startsWith("group "))
             .reduce((acc, g) => {
-                const match = String(g.label || "").match(/([A-L])/i);
-                const key = match ? match[1].toUpperCase() : null;
+                // Henter ut tallet fra "Group 1", "Group 2" osv.
+                const match = String(g.group || "").match(/\d+/);
+                const groupNumber = match ? match[0] : null;
+                const key = groupNumber ? groupNumberToLetter[groupNumber] : null;
                 
                 if (key && Array.isArray(g.rows)) {
                     acc[key] = g.rows.map(row => {
@@ -46,7 +55,7 @@ async function fetchExternalLiveData() {
                 return acc;
             }, {});
 
-        // Del 3: Sluttspill (Nøkler må matche det poengfunksjonen din for del 3 leter etter)
+        // Del 3: Sluttspill
         const rounds = Array.isArray(bracketData?.rounds) ? bracketData.rounds : [];
         const actualBracketRound = rounds.find(r => r?.name === "match_ups" && Array.isArray(r?.matchups));
         
