@@ -252,8 +252,8 @@ export default function LeaderboardPage() {
 
     function updatePart2Field(field, value) { 
         setPart2Actual((prev) => ({ ...prev, [field]: value })); 
-    }
-    
+    } 
+
     // Hjelpefunksjon for å håndtere avkryssing av flere svar (arrays)
     function handleCheckboxChange(field, optionValue) {
         const currentValues = Array.isArray(part2Actual[field]) ? part2Actual[field] : [];
@@ -263,7 +263,7 @@ export default function LeaderboardPage() {
             updatePart2Field(field, [...currentValues, optionValue]);
         }
     }
-    
+
     async function handleSaveActual() { 
         setAdminMessage(""); 
         try { 
@@ -346,131 +346,129 @@ export default function LeaderboardPage() {
 
                             <h3 style={{ marginTop: 0, marginBottom: 12 }}>Fasit del 2</h3> 
                             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}> 
-    
-    {/* q1 - FLERE SVAR */}
-    <div style={{ display: "block", border: "1px solid #ddd", padding: 8, borderRadius: 4, backgroundColor: "#fff" }}>
-        <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Toppscorer (q1) - Velg én eller flere</div>
-        <div style={{ maxHeight: "110px", overflowY: "auto", border: "1px solid #eee", padding: 4 }}>
-            {SCORERS.map(v => (
-                <label key={v} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 2, cursor: "pointer" }}>
-                    <input type="checkbox" checked={(part2Actual.q1 || []).includes(v)} onChange={() => handleCheckboxChange("q1", v)} />
-                    {v}
-                </label>
-            ))}
-        </div>
-    </div>
+                                
+                                {/* q1 - FLERE SVAR */}
+                                <div style={{ display: "block", border: "1px solid #ddd", padding: 8, borderRadius: 4, backgroundColor: "#fff" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Toppscorer (q1) - Velg én eller flere</div>
+                                    <div style={{ maxHeight: "110px", overflowY: "auto", border: "1px solid #eee", padding: 4 }}>
+                                        {SCORERS.map(v => (
+                                            <label key={v} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 2, cursor: "pointer" }}>
+                                                <input type="checkbox" checked={(part2Actual.q1 || []).includes(v)} onChange={() => handleCheckboxChange("q1", v)} />
+                                                {v}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
 
-    <label style={{ display: "block" }}>
-        <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Antall mål for toppscorer (q2)</div>
-        <input type="number" min={0} value={part2Actual.q2 || ""} onChange={(e) => updatePart2Field("q2", e.target.value)} style={{ width: "100%", padding: 5, boxSizing: "border-box" }} />
-    </label>
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Antall mål for toppscorer (q2)</div>
+                                    <input type="number" min={0} value={part2Actual.q2 || ""} onChange={(e) => updatePart2Field("q2", e.target.value)} style={{ width: "100%", padding: 5, boxSizing: "border-box" }} />
+                                </label>
 
-    {/* q3 - FLERE SVAR */}
-    <div style={{ display: "block", border: "1px solid #ddd", padding: 8, borderRadius: 4, backgroundColor: "#fff" }}>
-        <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Mestscorende lag (q3) - Velg én eller flere</div>
-        <div style={{ maxHeight: "110px", overflowY: "auto", border: "1px solid #eee", padding: 4 }}>
-            {TEAMS.map(v => (
-                <label key={v} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 2, cursor: "pointer" }}>
-                    <input type="checkbox" checked={(part2Actual.q3 || []).includes(v)} onChange={() => handleCheckboxChange("q3", v)} />
-                    {v}
-                </label>
-            ))}
-        </div>
-    </div>
+                                {/* q3 - FLERE SVAR */}
+                                <div style={{ display: "block", border: "1px solid #ddd", padding: 8, borderRadius: 4, backgroundColor: "#fff" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Mestscorende lag (q3) - Velg én eller flere</div>
+                                    <div style={{ maxHeight: "110px", overflowY: "auto", border: "1px solid #eee", padding: 4 }}>
+                                        {TEAMS.map(v => (
+                                            <label key={v} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 2, cursor: "pointer" }}>
+                                                <input type="checkbox" checked={(part2Actual.q3 || []).includes(v)} onChange={() => handleCheckboxChange("q3", v)} />
+                                                {v}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
 
-    {/* q4 - FLERE SVAR */}
-    <div style={{ display: "block", border: "1px solid #ddd", padding: 8, borderRadius: 4, backgroundColor: "#fff" }}>
-        <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Flest mål imot (q4) - Velg én eller flere</div>
-        <div style={{ maxHeight: "110px", overflowY: "auto", border: "1px solid #eee", padding: 4 }}>
-            {TEAMS.map(v => (
-                <label key={v} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 2, cursor: "pointer" }}>
-                    <input type="checkbox" checked={(part2Actual.q4 || []).includes(v)} onChange={() => handleCheckboxChange("q4", v)} />
-                    {v}
-                </label>
-            ))}
-        </div>
-    </div>
+                                {/* q4 - FLERE SVAR */}
+                                <div style={{ display: "block", border: "1px solid #ddd", padding: 8, borderRadius: 4, backgroundColor: "#fff" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Flest mål imot (q4) - Velg én eller flere</div>
+                                    <div style={{ maxHeight: "110px", overflowY: "auto", border: "1px solid #eee", padding: 4 }}>
+                                        {TEAMS.map(v => (
+                                            <label key={v} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 2, cursor: "pointer" }}>
+                                                <input type="checkbox" checked={(part2Actual.q4 || []).includes(v)} onChange={() => handleCheckboxChange("q4", v)} />
+                                                {v}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
 
-    <label style={{ display: "block" }}>
-        <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Antall mål i finalen (q5)</div>
-        <input type="number" min={0} value={part2Actual.q5 || ""} onChange={(e) => updatePart2Field("q5", e.target.value)} style={{ width: "100%", padding: 5, boxSizing: "border-box" }} />
-    </label>
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Antall mål i finalen (q5)</div>
+                                    <input type="number" min={0} value={part2Actual.q5 || ""} onChange={(e) => updatePart2Field("q5", e.target.value)} style={{ width: "100%", padding: 5, boxSizing: "border-box" }} />
+                                </label>
 
-    <label style={{ display: "block" }}>
-        <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Totalt antall mål i VM (q6)</div>
-        <select value={part2Actual.q6 || ""} onChange={(e) => updatePart2Field("q6", e.target.value)} style={{ width: "100%", padding: 6 }}>
-            <option value="">Velg</option>
-            {TOTAL_GOALS_OPTIONS.map(v => <option key={v} value={v}>{v}</option>)}
-        </select>
-    </label>
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Totalt antall mål i VM (q6)</div>
+                                    <select value={part2Actual.q6 || ""} onChange={(e) => updatePart2Field("q6", e.target.value)} style={{ width: "100%", padding: 6 }}>
+                                        <option value="">Velg</option>
+                                        {TOTAL_GOALS_OPTIONS.map(v => <option key={v} value={v}>{v}</option>)}
+                                    </select>
+                                </label>
 
-    <label style={{ display: "block" }}>
-        <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Hvem gjør det best, GER el. FRA? (q7)</div>
-        <select value={part2Actual.q7 || ""} onChange={(e) => updatePart2Field("q7", e.target.value)} style={{ width: "100%", padding: 6 }}>
-            <option value="">Velg</option>
-            <option value="Tyskland">Tyskland</option>
-            <option value="Frankrike">Frankrike</option>
-        </select>
-    </label>
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Hvem gjør det best, GER el. FRA? (q7)</div>
+                                    <select value={part2Actual.q7 || ""} onChange={(e) => updatePart2Field("q7", e.target.value)} style={{ width: "100%", padding: 6 }}>
+                                        <option value="">Velg</option>
+                                        <option value="Tyskland">Tyskland</option>
+                                        <option value="Frankrike">Frankrike</option>
+                                    </select>
+                                </label>
 
-    {/* q8 - FLERE SVAR */}
-    <div style={{ display: "block", border: "1px solid #ddd", padding: 8, borderRadius: 4, backgroundColor: "#fff" }}>
-        <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Flest gule kort (q8) - Velg én eller flere</div>
-        <div style={{ maxHeight: "110px", overflowY: "auto", border: "1px solid #eee", padding: 4 }}>
-            {TEAMS.map(v => (
-                <label key={v} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 2, cursor: "pointer" }}>
-                    <input type="checkbox" checked={(part2Actual.q8 || []).includes(v)} onChange={() => handleCheckboxChange("q8", v)} />
-                    {v}
-                </label>
-            ))}
-        </div>
-    </div>
+                                {/* q8 - FLERE SVAR */}
+                                <div style={{ display: "block", border: "1px solid #ddd", padding: 8, borderRadius: 4, backgroundColor: "#fff" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Flest gule kort (q8) - Velg én eller flere</div>
+                                    <div style={{ maxHeight: "110px", overflowY: "auto", border: "1px solid #eee", padding: 4 }}>
+                                        {TEAMS.map(v => (
+                                            <label key={v} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 2, cursor: "pointer" }}>
+                                                <input type="checkbox" checked={(part2Actual.q8 || []).includes(v)} onChange={() => handleCheckboxChange("q8", v)} />
+                                                {v}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
 
-    {/* q9 - FLERE SVAR */}
-    <div style={{ display: "block", border: "1px solid #ddd", padding: 8, borderRadius: 4, backgroundColor: "#fff" }}>
-        <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Første røde kort (q9) - Velg én eller flere</div>
-        <div style={{ maxHeight: "110px", overflowY: "auto", border: "1px solid #eee", padding: 4 }}>
-            {TEAMS.map(v => (
-                <label key={v} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 2, cursor: "pointer" }}>
-                    <input type="checkbox" checked={(part2Actual.q9 || []).includes(v)} onChange={() => handleCheckboxChange("q9", v)} />
-                    {v}
-                </label>
-            ))}
-        </div>
-    </div>
+                                {/* q9 - FLERE SVAR */}
+                                <div style={{ display: "block", border: "1px solid #ddd", padding: 8, borderRadius: 4, backgroundColor: "#fff" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Første røde kort (q9) - Velg én eller flere</div>
+                                    <div style={{ maxHeight: "110px", overflowY: "auto", border: "1px solid #eee", padding: 4 }}>
+                                        {TEAMS.map(v => (
+                                            <label key={v} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 2, cursor: "pointer" }}>
+                                                <input type="checkbox" checked={(part2Actual.q9 || []).includes(v)} onChange={() => handleCheckboxChange("q9", v)} />
+                                                {v}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
 
-    <label style={{ display: "block" }}>
-        <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Resultat Brasil - Haiti (q10)</div>
-        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <input type="number" placeholder="BRA" min={0} value={part2Actual.q10_brazil || ""} onChange={(e) => updatePart2Field("q10_brazil", e.target.value)} style={{ width: "100%", padding: 5, boxSizing: "border-box" }} />
-            <span>-</span>
-            <input type="number" placeholder="HAI" min={0} value={part2Actual.q10_haiti || ""} onChange={(e) => updatePart2Field("q10_haiti", e.target.value)} style={{ width: "100%", padding: 5, boxSizing: "border-box" }} />
-        </div>
-    </label>
+                                <label style={{ display: "block" }}>
+                                    <div style={{ fontSize: 12, fontWeight: "bold", marginBottom: 4 }}>Resultat Brasil - Haiti (q10)</div>
+                                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                                        <input type="number" placeholder="BRA" min={0} value={part2Actual.q10_brazil || ""} onChange={(e) => updatePart2Field("q10_brazil", e.target.value)} style={{ width: "100%", padding: 5, boxSizing: "border-box" }} />
+                                        <span>-</span>
+                                        <input type="number" placeholder="HAI" min={0} value={part2Actual.q10_haiti || ""} onChange={(e) => updatePart2Field("q10_haiti", e.target.value)} style={{ width: "100%", padding: 5, boxSizing: "border-box" }} />
+                                    </div>
+                                </label>
 
-    {/* Kamper seksjon */}
-    <div style={{ gridColumn: "1 / -1", marginTop: 8, padding: 10, border: "1px solid #ddd", borderRadius: 6, backgroundColor: "#fff" }}>
-        <div style={{ fontSize: 13, fontWeight: "bold", marginBottom: 8, color: "#374151" }}>Kampresultater (m1, m2, m3)</div>
-        {[
-            { key: "m1", label: "Kroatia - England" },
-            { key: "m2", label: "Tyskland - Elfenbenskysten" },
-            { key: "m3", label: "Uruguay - Spania" }
-        ].map((m) => (
-            <div key={m.key} style={{ marginBottom: 8, paddingBottom: 6, borderBottom: "1px dashed #eee", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div style={{ fontSize: 13, fontWeight: "500" }}>{m.label}</div>
-                <div style={{ display: "flex", gap: 14 }}>
-                    {HUB_OPTIONS.map((opt) => (
-                        <label key={opt} style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer", fontSize: 13 }}>
-                            <input type="radio" name={m.key} checked={part2Actual[m.key] === opt} onChange={() => updatePart2Field(m.key, opt)} />
-                            <span>{opt}</span>
-                        </label>
-                    ))}
-                </div>
-            </div>
-        ))}
-    </div>
-
-</div>
+                                {/* Kamper seksjon */}
+                                <div style={{ gridColumn: "1 / -1", marginTop: 8, padding: 10, border: "1px solid #ddd", borderRadius: 6, backgroundColor: "#fff" }}>
+                                    <div style={{ fontSize: 13, fontWeight: "bold", marginBottom: 8, color: "#374151" }}>Kampresultater (m1, m2, m3)</div>
+                                    {[
+                                        { key: "m1", label: "Kroatia - England" },
+                                        { key: "m2", label: "Tyskland - Elfenbenskysten" },
+                                        { key: "m3", label: "Uruguay - Spania" }
+                                    ].map((m) => (
+                                        <div key={m.key} style={{ marginBottom: 8, paddingBottom: 6, borderBottom: "1px dashed #eee", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                            <div style={{ fontSize: 13, fontWeight: "500" }}>{m.label}</div>
+                                            <div style={{ display: "flex", gap: 14 }}>
+                                                {HUB_OPTIONS.map((opt) => (
+                                                    <label key={opt} style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer", fontSize: 13 }}>
+                                                        <input type="radio" name={m.key} checked={part2Actual[m.key] === opt} onChange={() => updatePart2Field(m.key, opt)} />
+                                                        <span>{opt}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
 
                             </div> 
 
