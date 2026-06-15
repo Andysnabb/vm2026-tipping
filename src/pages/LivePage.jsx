@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 
 const STANDINGS_URL =
-    "https://sportscore.com/api/widget/standings/?sport=football&slug=fifa-world-cup&src=vm2026-tipping";
+    "https://script.google.com/macros/s/AKfycbyVSPhkCYuF2tdhG9Q5efrYnf0Mm40BaSOw5DVaHd7j97XAaREfCtSHJ7SmwoL6Ht7h/exec";
 const BRACKET_URL =
-    "https://sportscore.com/api/widget/bracket/?sport=football&slug=fifa-world-cup&src=vm2026-tipping";
+    "https://script.google.com/macros/s/AKfycbyVSPhkCYuF2tdhG9Q5efrYnf0Mm40BaSOw5DVaHd7j97XAaREfCtSHJ7SmwoL6Ht7h/exec";
 
 function pick(...values) {
     for (const v of values) {
