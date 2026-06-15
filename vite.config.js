@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // Proxy target for development: read from VITE_API_BASE or fallback to the last known Apps Script URL
-const API_TARGET = process.env.VITE_API_BASE || 'https://script.google.com/macros/s/AKfycbyaNflTNpa89Z-iHyqaQobzcRUPSMcA6G5K-FWZCJuHYdtsDpf_PdisN_ku2596jafe/exec';
+const API_TARGET = process.env.VITE_API_BASE || 'https://script.google.com/macros/s/AKfycbzrQOHVcdiBMVpJhxscs3UbmA1M5GJkShf9jBOpNUKB0oJzse3IBoa2qsoBM0EMNBgl/exec';
 
 // https://vite.dev/config/
 export default defineConfig({
