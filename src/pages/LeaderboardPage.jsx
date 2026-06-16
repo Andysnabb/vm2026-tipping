@@ -109,8 +109,8 @@ async function fetchLiveDataFromProxy() {
     try {
         // Hent standings + bracket parallelt fra backend-proxyen
         const [standingsRes, bracketRes] = await Promise.all([
-            fetch(`${API_BASE}?action=live`),
-            fetch(`${API_BASE}?action=liveBracket`)
+            fetch(`${API_BASE}?action=liveParsed`),
+            fetch(`${API_BASE}?action=liveBracketParsed`)
         ]);
 
         if (!standingsRes.ok) {
