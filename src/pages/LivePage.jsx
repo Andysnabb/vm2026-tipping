@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 
 const STANDINGS_URL =
-    "https://script.google.com/macros/s/AKfycbxN-ZnODsrgKmIWlCRil4NNvNAB2LeySLSyHZu7CHvJLO8bN76Nl_in7DeurMUpqhEV/exec";
+    "https://script.google.com/macros/s/AKfycbzFqFHylYmSxbu5Msdn8-gn9pg0wHpID-WDAnd0vYxRx7TFJR334uQOPmwL3D9KjlCh/exec";
 const BRACKET_URL =
-    "https://script.google.com/macros/s/AKfycbxN-ZnODsrgKmIWlCRil4NNvNAB2LeySLSyHZu7CHvJLO8bN76Nl_in7DeurMUpqhEV/exec";
+    "https://script.google.com/macros/s/AKfycbzFqFHylYmSxbu5Msdn8-gn9pg0wHpID-WDAnd0vYxRx7TFJR334uQOPmwL3D9KjlCh/exec";
 
 function pick(...values) {
     for (const v of values) {
