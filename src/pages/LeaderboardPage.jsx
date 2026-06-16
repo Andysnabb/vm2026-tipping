@@ -254,12 +254,15 @@ export default function LeaderboardPage() {
     async function loadLeaderboardData() { 
         setLoading(true); 
         try { 
-            const [submissionsRes, actualsRes, liveData] = await Promise.all([
+            // Hent submissions, fasit og ferdig-prosessert live-data parallelt
+            const [submissionsRes, actualsRes, liveParsedRes, liveBracketParsedRes] = await Promise.all([
                 fetch(`${API_BASE}?action=all`),
                 getActuals().catch(() => ({ ok: false, data: null })),
-                USE_PROXY ? fetchLiveDataFromProxy() : fetchExternalLiveData()
+                fetch(`${API_BASE}?action=liveParsed`),
+                fetch(`${API_BASE}?action=liveBracketParsed`)
             ]);
-
+    
+            // --- SUBMISSIONS ---
             const submissionsJson = await submissionsRes.json(); 
             if (submissionsJson?.ok && Array.isArray(submissionsJson.data)) { 
                 setData(submissionsJson.data); 
@@ -268,24 +271,36 @@ export default function LeaderboardPage() {
             } else { 
                 setData([]); 
             } 
-
+    
+            // --- FASIT (del 2) ---
             const srv = actualsRes?.ok && actualsRes?.data ? actualsRes.data : null; 
-            setServerActual(srv); 
-
+            setServerActual(srv);
+    
+            // --- LIVE DATA (del 1 + del 3) ---
+            const liveParsedJson = await liveParsedRes.json();
+            const liveBracketParsedJson = await liveBracketParsedRes.json();
+    
+            const groups = liveParsedJson?.data?.groups || {};
+            const knockout = liveBracketParsedJson?.data?.knockout || {};
+    
+            // Sett samlet actual-data
             setActual({
-                groups: liveData.groups || {},
+                groups,
                 part2: srv?.part2 || {},
-                knockout: liveData.knockout || {}
+                knockout
             });
-
+    
+            // Sett del 2-fasit i admin-panelet
             setPart2Actual(srv?.part2 || {}); 
+    
         } catch (error) { 
             console.error("Feil ved lasting av data:", error);
             setData([]); 
         } finally { 
             setLoading(false); 
         } 
-    } 
+    }
+
 
     useEffect(() => { 
         loadLeaderboardData(); 
