@@ -6,6 +6,8 @@ import { API_BASE } from "../config";
 const STANDINGS_URL = "https://sportscore.com/api/widget/standings/?sport=football&slug=fifa-world-cup&src=vm2026-tipping";
 const BRACKET_URL = "https://sportscore.com/api/widget/bracket/?sport=football&slug=fifa-world-cup&src=vm2026-tipping";
 
+const USE_PROXY = true;
+
 const SCORERS = [ 
     "Álvarez (ARG)", "Balogun (USA)", "Dembélé (FRA)", "Depay (NED)", 
     "Haaland (NOR)", "Kane (ENG)", "Lukaku (BEL)", "Martínez (ARG)", 
@@ -99,6 +101,45 @@ async function fetchExternalLiveData() {
         return { groups, knockout };
     } catch (err) {
         console.error("Feil ved henting av eksterne live-data:", err);
+        return { groups: {}, knockout: {} };
+    }
+}
+
+async function fetchLiveDataFromProxy() {
+    try {
+        // Hent standings + bracket parallelt fra backend-proxyen
+        const [standingsRes, bracketRes] = await Promise.all([
+            fetch(`${API_BASE}?action=live`),
+            fetch(`${API_BASE}?action=liveBracket`)
+        ]);
+
+        if (!standingsRes.ok) {
+            throw new Error(`Proxy standings-feil: ${standingsRes.status}`);
+        }
+        if (!bracketRes.ok) {
+            throw new Error(`Proxy bracket-feil: ${bracketRes.status}`);
+        }
+
+        const standingsRaw = await standingsRes.json();
+        const bracketRaw = await bracketRes.json();
+
+        // Backend-proxyen returnerer:
+        // { ok: true, source: "...", data: {...} }
+        const standings = standingsRaw?.data;
+        const bracket = bracketRaw?.data;
+
+        if (!standings || !bracket) {
+            throw new Error("Proxy-data mangler 'data'-felt");
+        }
+
+        // Returner i nøyaktig det formatet LeaderboardPage bruker
+        return {
+            groups: standings.groups || {},
+            knockout: bracket.knockout || {}
+        };
+
+    } catch (err) {
+        console.error("Feil ved henting av proxy-live-data:", err);
         return { groups: {}, knockout: {} };
     }
 }
@@ -213,11 +254,11 @@ export default function LeaderboardPage() {
     async function loadLeaderboardData() { 
         setLoading(true); 
         try { 
-            const [submissionsRes, actualsRes, liveData] = await Promise.all([ 
-                fetch(`${API_BASE}?action=all`), 
+            const [submissionsRes, actualsRes, liveData] = await Promise.all([
+                fetch(`${API_BASE}?action=all`),
                 getActuals().catch(() => ({ ok: false, data: null })),
-                fetchExternalLiveData()
-            ]); 
+                USE_PROXY ? fetchLiveDataFromProxy() : fetchExternalLiveData()
+            ]);
 
             const submissionsJson = await submissionsRes.json(); 
             if (submissionsJson?.ok && Array.isArray(submissionsJson.data)) { 
