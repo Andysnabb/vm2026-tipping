@@ -344,7 +344,8 @@ export default function LeaderboardPage() {
     const sortedData = useMemo(() => { 
         return [...data].map(row => {
             const parsedPart1 = safeJsonParse(row.part1Json || row.part1, { groups: {} });
-            
+            console.log("DEBUG parsedPart1 for", row.name, parsedPart1);
+
             const p1 = pointsPart1(parsedPart1, actual); 
             const p2 = pointsPart2(row, actual); 
             const p3 = pointsPart3(row, actual); 
