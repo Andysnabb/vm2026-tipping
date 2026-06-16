@@ -375,58 +375,71 @@ export default function LivePage() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        async function load() {
-            try {
-                setLoading(true);
-                setError("");
+    async function load() {
+        try {
+            setLoading(true);
+            setError("");
 
-                const [standingsResponse, bracketResponse] = await Promise.all([
-                    fetch(STANDINGS_URL),
-                    fetch(BRACKET_URL)
-                ]);
+            // Hent standings + bracket parallelt
+            const [standingsResponse, bracketResponse] = await Promise.all([
+                fetch(STANDINGS_URL),
+                fetch(BRACKET_URL)
+            ]);
 
-                if (!standingsResponse.ok) {
-                    throw new Error(`Standings-feil: ${standingsResponse.status}`);
-                }
-                if (!bracketResponse.ok) {
-                    throw new Error(`Bracket-feil: ${bracketResponse.status}`);
-                }
-
-                const standingsData = await standingsResponse.json();
-                const bracketData = await bracketResponse.json();
-
-                setGroups(extractStandingsGroups(standingsData));
-                setThirds(extractBestThirds(standingsData));
-                setMatches(extractBracketMatches(bracketData));
-
-                try {
-                    const liveActual = {
-                        groups: extractStandingsGroups(standingsData).reduce((acc, g) => {
-                            const match = String(g.label || "").match(/([A-L])/i);
-                            const key = match ? match[1].toUpperCase() : null;
-                            if (key) acc[key] = g.rows.map(r => r.team);
-                            return acc;
-                        }, {}),
-                        knockout: {}
-                    };
-                    try {
-                        localStorage.setItem("actual_live", JSON.stringify(liveActual));
-                    } catch {
-                        // ignore storage errors
-                    }
-                } catch {
-                    // ignore storage errors
-                }
-            } catch (err) {
-                console.error(err);
-                setError(err instanceof Error ? err.message : "Ukjent feil");
-            } finally {
-                setLoading(false);
+            if (!standingsResponse.ok) {
+                throw new Error(`Standings-feil: ${standingsResponse.status}`);
             }
-        }
+            if (!bracketResponse.ok) {
+                throw new Error(`Bracket-feil: ${bracketResponse.status}`);
+            }
 
-        load();
-    }, []);
+            // LES JSON
+            const standingsRaw = await standingsResponse.json();
+            const bracketRaw = await bracketResponse.json();
+
+            // HENT DEN FAKTISKE DATAEN
+            const standings = standingsRaw.data;
+            const bracket = bracketRaw.data;
+
+            if (!standings) {
+                throw new Error("Standings mangler 'data'-felt");
+            }
+            if (!bracket) {
+                throw new Error("Bracket mangler 'data'-felt");
+            }
+
+            // OPPDATER STATE
+            setGroups(extractStandingsGroups(standings));
+            setThirds(extractBestThirds(standings));
+            setMatches(extractBracketMatches(bracket));
+
+            // LAGRE LIVE-DATA I LOCALSTORAGE (valgfritt)
+            try {
+                const liveActual = {
+                    groups: extractStandingsGroups(standings).reduce((acc, g) => {
+                        const match = String(g.label || "").match(/([A-L])/i);
+                        const key = match ? match[1].toUpperCase() : null;
+                        if (key) acc[key] = g.rows.map(r => r.team);
+                        return acc;
+                    }, {}),
+                    knockout: {}
+                };
+
+                localStorage.setItem("actual_live", JSON.stringify(liveActual));
+            } catch {
+                // ignorer lagringsfeil
+            }
+
+        } catch (err) {
+            console.error("LOAD FEIL:", err);
+            setError(err instanceof Error ? err.message : "Ukjent feil");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    load();
+}, []);
 
     const groupedMatches = useMemo(() => groupMatchesByRound(matches), [matches]);
 
