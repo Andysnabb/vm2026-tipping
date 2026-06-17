@@ -274,15 +274,13 @@ export default function LeaderboardPage() {
     async function loadLeaderboardData() { 
         setLoading(true); 
         try { 
-            // Hent submissions, fasit og ferdig-prosessert live-data parallelt
-            const [submissionsRes, actualsRes, liveParsedRes, liveBracketParsedRes] = await Promise.all([
+            const [submissionsRes, actualsRes, liveData] = await Promise.all([
                 fetch(`${API_BASE}?action=all`),
                 getActuals().catch(() => ({ ok: false, data: null })),
-                fetch(`${API_BASE}?action=liveParsed`),
-                fetch(`${API_BASE}?action=liveBracketParsed`)
+                USE_PROXY ? fetchLiveDataFromProxy() : fetchExternalLiveData()
             ]);
     
-            // --- SUBMISSIONS ---
+            // SUBMISSIONS
             const submissionsJson = await submissionsRes.json(); 
             if (submissionsJson?.ok && Array.isArray(submissionsJson.data)) { 
                 setData(submissionsJson.data); 
@@ -292,30 +290,18 @@ export default function LeaderboardPage() {
                 setData([]); 
             } 
     
-            // --- FASIT (del 2) ---
+            // FASIT (del 2)
             const srv = actualsRes?.ok && actualsRes?.data ? actualsRes.data : null; 
-            setServerActual(srv);
+            setServerActual(srv); 
     
-            // --- LIVE DATA (del 1 + del 3) ---
-            const liveParsedJson = await liveParsedRes.json();
-            const liveBracketParsedJson = await liveBracketParsedRes.json();
-    
-            const groups = liveParsedJson?.data?.groups || {};
-            const knockout = liveBracketParsedJson?.data?.knockout || {};
-            
-            console.log("DEBUG setActual groups:", groups);
-            console.log("DEBUG setActual knockout:", knockout);
-            
-            // Sett samlet actual-data
+            // LIVE (del 1 + del 3) – kommer nå fra proxy / external
             setActual({
-                groups,
+                groups: liveData.groups || {},
                 part2: srv?.part2 || {},
-                knockout
+                knockout: liveData.knockout || {}
             });
     
-            // Sett del 2-fasit i admin-panelet
             setPart2Actual(srv?.part2 || {}); 
-    
         } catch (error) { 
             console.error("Feil ved lasting av data:", error);
             setData([]); 
@@ -323,7 +309,6 @@ export default function LeaderboardPage() {
             setLoading(false); 
         } 
     }
-
 
     useEffect(() => { 
         loadLeaderboardData(); 
