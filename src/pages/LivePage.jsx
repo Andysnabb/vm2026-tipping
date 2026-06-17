@@ -411,8 +411,12 @@ export default function LivePage() {
             // standings.groups: { A: [...], B: [...], ... }
             // standings.thirds: [...]
             // bracket.knockout: { ... }
-    
-            setGroups(standings.groups || {});
+            const normalizedGroups = {};
+                for (const [letter, rows] of Object.entries(standings.groups || {})) {
+                    normalizedGroups[letter] = rows.map((row, i) => normalizeStandingRow(row, i));
+                }
+            setGroups(normalizedGroups);
+        
             setThirds(standings.thirds || []);
             setMatches(bracket.knockout || {});
     
