@@ -154,67 +154,69 @@ export default function AnswersPage() {
                 </div>
 
                 {view === "part1" && (
-                    ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"].map((group) => (
-                <div key={group} style={{ marginBottom: 30 }}>
-                    <h2>Gruppe {group}</h2>
-
-                    <div className="table-scroll">
-                      <table className="answers-table">
-                        <thead>
+                  ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"].map((group) => (
+                    <div key={group} style={{ marginBottom: 30 }}>
+                      <h2>Gruppe {group}</h2>
+                
+                      <div className="table-scroll">
+                        <table className="answers-table">
+                          <thead>
                             <tr>
-                                <th style={{ border: "1px solid #ccc", padding: 2, width: 20 }}></th>
-                                {data.map((row) => (
-                                    <th
-                                        key={row.participantId}
-                                        style={{
-                                            border: "1px solid #ccc",
-                                            padding: 6,
-                                            wordBreak: "break-word"
-                                        }}
-                                    >
-                                        {row.name}
-                                    </th>
-                                ))}
+                              <th style={{ border: "1px solid #ccc", padding: 2, width: 20 }}></th>
+                              {data.map((row) => (
+                                <th
+                                  key={row.participantId}
+                                  style={{
+                                    border: "1px solid #ccc",
+                                    padding: 6,
+                                    wordBreak: "break-word"
+                                  }}
+                                >
+                                  {row.name}
+                                </th>
+                              ))}
                             </tr>
-                        </thead>
-
-                        <tbody>
+                          </thead>
+                
+                          <tbody>
                             {[0, 1, 2, 3].map((pos) => (
-                                <tr key={pos}>
-                                    <td style={{ border: "1px solid #ccc", padding: 6 }}>
-                                        {pos + 1}
+                              <tr key={pos}>
+                                <td style={{ border: "1px solid #ccc", padding: 6 }}>
+                                  {pos + 1}
+                                </td>
+                
+                                {data.map((row) => {
+                                  const part1 = row.part1Json
+                                    ? JSON.parse(row.part1Json)
+                                    : null;
+                
+                                  return (
+                                    <td
+                                      key={row.participantId + pos}
+                                      style={{
+                                        border: "1px solid #ccc",
+                                        padding: 6,
+                                        wordBreak: "break-word"
+                                      }}
+                                    >
+                                      {part1 &&
+                                      part1.groups &&
+                                      part1.groups[group] &&
+                                      part1.groups[group][pos]
+                                        ? part1.groups[group][pos]
+                                        : ""}
                                     </td>
-
-                                    {data.map((row) => {
-                                        const part1 = row.part1Json
-                                            ? JSON.parse(row.part1Json)
-                                            : null;
-
-                                        return (
-                                            <td
-                                                key={row.participantId + pos}
-                                                style={{
-                                                    border: "1px solid #ccc",
-                                                    padding: 6,
-                                                    wordBreak: "break-word"
-                                                }}
-                                            >
-                                                {part1 &&
-                                                    part1.groups &&
-                                                    part1.groups[group] &&
-                                                    part1.groups[group][pos]
-                                                    ? part1.groups[group][pos]
-                                                    : ""}
-                                            </td>
-                                        );
-                                    })}
-                                </tr>
+                                  );
+                                })}
+                              </tr>
                             ))}
-                        </tbody>
-                    </table>
-                </div>
-            ))}
-            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ))
+                )}
+
             {view === "part2" && (
                 <div>
                     <h2>Del 2</h2>
