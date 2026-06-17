@@ -444,24 +444,26 @@ export default function LivePage() {
             teams
         }));
     }, [matches]);
-
+    
     if (loading) {
         return <div style={styles.stateMessage}>Laster...</div>;
     }
-
+    
     if (error) {
         return <div style={{ ...styles.stateMessage, color: "crimson" }}>{error}</div>;
     }
-
+    
     return (
         <div style={styles.page}>
             <div style={styles.headerRow}>
                 <div>
                     <h1 style={styles.pageTitle}>VM Oversikt</h1>
-                    <div style={styles.pageSubtitle}>Gruppespill, beste treere og sluttspill i én oversikt.</div>
+                    <div style={styles.pageSubtitle}>
+                        Gruppespill, beste treere og sluttspill i én oversikt.
+                    </div>
                 </div>
             </div>
-
+    
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>Grupper</h2>
                 {Object.entries(groups).map(([letter, rows]) => (
@@ -471,7 +473,7 @@ export default function LivePage() {
                     </div>
                 ))}
             </section>
-
+    
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>Beste treere</h2>
                 {thirds.length === 0 ? (
@@ -480,14 +482,17 @@ export default function LivePage() {
                     <StandingTable rows={thirds} />
                 )}
             </section>
-
+    
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>Sluttspill</h2>
-                    {Object.keys(matches).length === 0 ? (
+                {Object.keys(matches).length === 0 ? (
+                    <div style={styles.emptyState}>Fant ingen sluttspillkamper.</div>
+                ) : (
+                    <KnockoutBracket groupedMatches={groupedMatches} />
+                )}
             </section>
         </div>
     );
-}
 
 const styles = {
     page: {
