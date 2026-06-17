@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { API_BASE } from "../config"; 
 
-const STANDINGS_URL =
-    "https://script.google.com/macros/s/AKfycbxYCS1MYTSuINLIXjis_F2tZ-TDxbHsDvpLStaK8H9jiGvPbmfNemx04F3QRGDbNCQX/exec";
-const BRACKET_URL =
-    "https://script.google.com/macros/s/AKfycbxYCS1MYTSuINLIXjis_F2tZ-TDxbHsDvpLStaK8H9jiGvPbmfNemx04F3QRGDbNCQX/exec";
+//const STANDINGS_URL =
+//    "https://script.google.com/macros/s/AKfycbxYCS1MYTSuINLIXjis_F2tZ-TDxbHsDvpLStaK8H9jiGvPbmfNemx04F3QRGDbNCQX/exec";
+//const BRACKET_URL =
+//    "https://script.google.com/macros/s/AKfycbxYCS1MYTSuINLIXjis_F2tZ-TDxbHsDvpLStaK8H9jiGvPbmfNemx04F3QRGDbNCQX/exec";
 
 function pick(...values) {
     for (const v of values) {
@@ -379,57 +380,52 @@ export default function LivePage() {
         try {
             setLoading(true);
             setError("");
-
-            // Hent standings + bracket parallelt
-            const [standingsResponse, bracketResponse] = await Promise.all([
-                fetch(STANDINGS_URL),
-                fetch(BRACKET_URL)
+    
+            // Bruk samme proxy-endepunkter som LeaderboardPage
+            const [standingsRes, bracketRes] = await Promise.all([
+                fetch(`${API_BASE}?action=liveParsed`),
+                fetch(`${API_BASE}?action=liveBracketParsed`)
             ]);
-
-            if (!standingsResponse.ok) {
-                throw new Error(`Standings-feil: ${standingsResponse.status}`);
+    
+            if (!standingsRes.ok) {
+                throw new Error(`Standings-feil: ${standingsRes.status}`);
             }
-            if (!bracketResponse.ok) {
-                throw new Error(`Bracket-feil: ${bracketResponse.status}`);
+            if (!bracketRes.ok) {
+                throw new Error(`Bracket-feil: ${bracketRes.status}`);
             }
-
-            // LES JSON
-            const standingsRaw = await standingsResponse.json();
-            const bracketRaw = await bracketResponse.json();
-
-            // HENT DEN FAKTISKE DATAEN
-            const standings = standingsRaw.data;
-            const bracket = bracketRaw.data;
-
+    
+            const standingsRaw = await standingsRes.json();
+            const bracketRaw = await bracketRes.json();
+    
+            const standings = standingsRaw?.data;
+            const bracket = bracketRaw?.data;
+    
             if (!standings) {
                 throw new Error("Standings mangler 'data'-felt");
             }
             if (!bracket) {
                 throw new Error("Bracket mangler 'data'-felt");
             }
-
-            // OPPDATER STATE
-            setGroups(extractStandingsGroups(standings));
-            setThirds(extractBestThirds(standings));
-            setMatches(extractBracketMatches(bracket));
-
-            // LAGRE LIVE-DATA I LOCALSTORAGE (valgfritt)
+    
+            // Her antar vi at backend nå returnerer ferdig-parset struktur:
+            // standings.groups: { A: [...], B: [...], ... }
+            // standings.thirds: [...]
+            // bracket.knockout: { ... }
+    
+            setGroups(standings.groups || {});
+            setThirds(standings.thirds || []);
+            setMatches(bracket.knockout || {});
+    
             try {
                 const liveActual = {
-                    groups: extractStandingsGroups(standings).reduce((acc, g) => {
-                        const match = String(g.label || "").match(/([A-L])/i);
-                        const key = match ? match[1].toUpperCase() : null;
-                        if (key) acc[key] = g.rows.map(r => r.team);
-                        return acc;
-                    }, {}),
-                    knockout: {}
+                    groups: standings.groups || {},
+                    knockout: bracket.knockout || {}
                 };
-
                 localStorage.setItem("actual_live", JSON.stringify(liveActual));
             } catch {
                 // ignorer lagringsfeil
             }
-
+    
         } catch (err) {
             console.error("LOAD FEIL:", err);
             setError(err instanceof Error ? err.message : "Ukjent feil");
