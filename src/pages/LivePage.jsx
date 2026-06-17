@@ -493,7 +493,8 @@ export default function LivePage() {
             </section>
         </div>
     );
-
+}
+    
 const styles = {
     page: {
         padding: 20,
