@@ -395,8 +395,10 @@ export default function LivePage() {
             }
     
             const standingsRaw = await standingsRes.json();
-            const bracketRaw = await bracketRes.json();
-    
+            console.log("STANDINGS RAW:", standingsRaw);
+            console.log("STANDINGS RAW DATA:", standingsRaw.data);
+
+            const bracketRaw = await bracketRes.json();    
             const standings = standingsRaw?.data;
             const bracket = bracketRaw?.data;
     
