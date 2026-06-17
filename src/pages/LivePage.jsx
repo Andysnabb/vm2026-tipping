@@ -417,7 +417,7 @@ export default function LivePage() {
                 }
             setGroups(normalizedGroups);
         
-            setThirds(extractBestThirds(standings));
+            setThirds(extractBestThirds(standingsRaw.data));
             setMatches(bracket.knockout || {});
     
             try {
