@@ -165,6 +165,8 @@ function matchesActual(predicted, actual) {
 // POENGBEREGNINGER
 // ============================================================================
 function pointsPart1(participantParsed, currentActual) {
+    console.log("DEBUG pointsPart1 currentActual.groups:", currentActual.groups);
+
     if (!participantParsed?.groups || !currentActual?.groups) return 0;
     let score = 0;
 
@@ -282,7 +284,10 @@ export default function LeaderboardPage() {
     
             const groups = liveParsedJson?.data?.groups || {};
             const knockout = liveBracketParsedJson?.data?.knockout || {};
-    
+            
+            console.log("DEBUG setActual groups:", groups);
+            console.log("DEBUG setActual knockout:", knockout);
+            
             // Sett samlet actual-data
             setActual({
                 groups,
