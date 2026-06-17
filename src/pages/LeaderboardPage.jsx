@@ -109,7 +109,6 @@ async function fetchLiveDataFromProxy() {
     console.log("DEBUG fetchLiveDataFromProxy CALLED");
 
     try {
-        // Hent standings + bracket parallelt fra backend-proxyen
         const [standingsRes, bracketRes] = await Promise.all([
             fetch(`${API_BASE}?action=liveParsed`),
             fetch(`${API_BASE}?action=liveBracketParsed`)
@@ -125,15 +124,12 @@ async function fetchLiveDataFromProxy() {
             throw new Error(`Proxy bracket-feil: ${bracketRes.status}`);
         }
 
-        // 🔥 EXACT PLACE TO LOG RAW JSON
         const standingsRaw = await standingsRes.json();
         const bracketRaw = await bracketRes.json();
 
         console.log("DEBUG standingsRaw:", standingsRaw);
         console.log("DEBUG bracketRaw:", bracketRaw);
 
-        // Backend-proxyen returnerer:
-        // { ok: true, source: "...", data: {...} }
         const standings = standingsRaw?.data;
         const bracket = bracketRaw?.data;
 
@@ -145,7 +141,6 @@ async function fetchLiveDataFromProxy() {
             throw new Error("Proxy-data mangler 'data'-felt");
         }
 
-        // 🔥 EXACT PLACE TO LOG WHAT WE RETURN
         const result = {
             groups: standings.groups || {},
             knockout: bracket.knockout || {}
@@ -160,7 +155,6 @@ async function fetchLiveDataFromProxy() {
         return { groups: {}, knockout: {} };
     }
 }
-
 
 function safeJsonParse(value, fallback = null) { 
     if (!value) return fallback; 
