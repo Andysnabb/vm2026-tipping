@@ -158,7 +158,8 @@ export default function AnswersPage() {
                 <div key={group} style={{ marginBottom: 30 }}>
                     <h2>Gruppe {group}</h2>
 
-                    <table style={{ borderCollapse: "collapse", width: "100%", tableLayout: "fixed" }}>
+                    <div className="table-scroll">
+                      <table className="answers-table">
                         <thead>
                             <tr>
                                 <th style={{ border: "1px solid #ccc", padding: 2, width: 20 }}></th>
@@ -220,8 +221,8 @@ export default function AnswersPage() {
                 <div>
                     <h2>Del 2</h2>
 
-
-                    <table style={{ borderCollapse: "collapse", width: "100%", tableLayout: "fixed" }}>
+                    <div className="table-scroll">
+                      <table className="answers-table">
                         <thead>
                             <tr>
                                 <th style={{ border: "1px solid #ccc", padding: 8, width: 100 }}>
@@ -301,7 +302,8 @@ export default function AnswersPage() {
                 <div>
                     <h2>Del 3</h2>
 
-                    <table style={{ borderCollapse: "collapse", width: "100%", tableLayout: "fixed" }}>
+                    <div className="table-scroll">
+                      <table className="answers-table">
                         <thead>
                             <tr>
                                 <th style={{ border: "1px solid #ccc", padding: 6, width: 120 }}>
