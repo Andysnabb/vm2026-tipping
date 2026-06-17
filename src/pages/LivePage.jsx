@@ -369,9 +369,9 @@ function KnockoutBracket({ groupedMatches }) {
 }
 
 export default function LivePage() {
-    const [groups, setGroups] = useState([]);
+    const [groups, setGroups] = useState({});
     const [thirds, setThirds] = useState([]);
-    const [matches, setMatches] = useState([]);
+    const [matches, setMatches] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
