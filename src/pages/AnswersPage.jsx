@@ -218,176 +218,169 @@ export default function AnswersPage() {
                 )}
 
             {view === "part2" && (
-                <div>
-                    <h2>Del 2</h2>
-
-                    <div className="table-scroll">
-                      <table className="answers-table">
-                        <thead>
-                            <tr>
-                                <th style={{ border: "1px solid #ccc", padding: 8, width: 100 }}>
-                                    Spm.
-                                </th>
-
-                                {data.map((row) => (
-                                    <th
-                                        key={row.participantId}
-                                        style={{
-                                            border: "1px solid #ccc",
-                                            padding: 6,
-                                            fontWeight: "bold",
-                                            backgroundColor: "#f5f5f5",
-                                            wordBreak: "break-word",
-                                            overflowWrap: "anywhere"
-                                        }}
-                                    >
-                                        {row.name}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "m1", "m2", "m3"].map((question) => (
-                                <tr key={labels[question] || question}>
-                                    <td style={{
-                                        border: "1px solid #ccc",
-                                        padding: 6,
-                                        fontWeight: "bold",
-                                        backgroundColor : "#f5f5f5",
-                                        wordBreak: "break-word",
-                                        overflowWrap: "anywhere"
-                                    }}>
-                                        {labels[question] || question}
-                                    </td>
-
-                                    {data.map((row) => {
-                                        const part2 = row.part2Json
-                                            ? JSON.parse(row.part2Json)
-                                            : null;
-
-                                        return (
-                                            <td
-                                                key={row.participantId + question}
-                                                
-                                                style={{
-                                                    border: "1px solid #ccc",
-                                                    padding: 4,
-                                                    wordBreak: "break-word",
-                                                    overflowWrap: "anywhere",
-                                                    fontSize: 13,
-                                                    lineHeight: 1.2
-                                                }}
-
-                                            >
-                                                
-                                                {part2
-                                                    ? question === "q10"
-                                                        ? `${part2.q10_brazil || ""} - ${part2.q10_haiti || ""}`
-                                                        : part2[question] || ""
-                                                    : ""}
-
-                                            </td>
-                                        );
-                                    })}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+              <div>
+                <h2>Del 2</h2>
+            
+                <div className="table-scroll">
+                  <table className="answers-table">
+                    <thead>
+                      <tr>
+                        <th style={{ border: "1px solid #ccc", padding: 8, width: 100 }}>
+                          Spm.
+                        </th>
+            
+                        {data.map((row) => (
+                          <th
+                            key={row.participantId}
+                            style={{
+                              border: "1px solid #ccc",
+                              padding: 6,
+                              fontWeight: "bold",
+                              backgroundColor: "#f5f5f5",
+                              wordBreak: "break-word",
+                              overflowWrap: "anywhere"
+                            }}
+                          >
+                            {row.name}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+            
+                    <tbody>
+                      {["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "m1", "m2", "m3"].map(
+                        (question) => (
+                          <tr key={labels[question] || question}>
+                            <td
+                              style={{
+                                border: "1px solid #ccc",
+                                padding: 6,
+                                width: 120,
+                                fontWeight: "bold",
+                                backgroundColor: "#f5f5f5",
+                                wordBreak: "break-word",
+                                overflowWrap: "anywhere"
+                              }}
+                            >
+                              {labels[question] || question}
+                            </td>
+            
+                            {data.map((row) => {
+                              const part2 = row.part2Json ? JSON.parse(row.part2Json) : null;
+            
+                              return (
+                                <td
+                                  key={row.participantId + question}
+                                  style={{
+                                    border: "1px solid #ccc",
+                                    padding: 4,
+                                    wordBreak: "break-word",
+                                    overflowWrap: "anywhere",
+                                    fontSize: 13,
+                                    lineHeight: 1.2
+                                  }}
+                                >
+                                  {part2
+                                    ? question === "q10"
+                                      ? `${part2.q10_brazil || ""} - ${part2.q10_haiti || ""}`
+                                      : part2[question] || ""
+                                    : ""}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        )
+                      )}
+                    </tbody>
+                  </table>
                 </div>
+              </div>
             )}
+
             {view === "part3" && (
-                <div>
-                    <h2>Del 3</h2>
+  <div>
+    <h2>Del 3</h2>
 
-                    <div className="table-scroll">
-                      <table className="answers-table">
-                        <thead>
-                            <tr>
-                                <th style={{ border: "1px solid #ccc", padding: 6 }}>
-                                    Runde
-                                </th>
+    <div className="table-scroll">
+      <table className="answers-table">
+        <thead>
+          <tr>
+            <th style={{ border: "1px solid #ccc", padding: 6, width: 120 }}>
+              Runde
+            </th>
 
-                                {data.map((row) => (
-                                    <th
-                                        key={row.participantId}
-                                        style={{
-                                            border: "1px solid #ccc",
-                                            padding: 6,
-                                            fontWeight: "bold",
-                                            backgroundColor : "#f5f5f5",
-                                            wordBreak: "break-word"
-                                        }}
-                                    >
-                                        {row.name}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
+            {data.map((row) => (
+              <th
+                key={row.participantId}
+                style={{
+                  border: "1px solid #ccc",
+                  padding: 6,
+                  fontWeight: "bold",
+                  backgroundColor: "#f5f5f5",
+                  wordBreak: "break-word"
+                }}
+              >
+                {row.name}
+              </th>
+            ))}
+          </tr>
+        </thead>
 
-                        <tbody>
-                            {
-                                [
-                                    "roundOf32",
-                                    "roundOf16",
-                                    "quarterfinals",
-                                    "semifinals",
-                                    "bronzeFinal",
-                                    "final"
-                                ]
-                                .map((key) => (
-                                <tr key={key}>
-                                    <td style={{ border: "1px solid #ccc", padding: 6 }}>
-                                        {
-                                         key === "roundOf32"
-                                          ? "16-delsfinaler"
-                                          : key === "roundOf16"
-                                          ? "8-delsfinaler"
-                                          : key === "quarterfinals"
-                                          ? "Kvartfinaler"
-                                          : key === "semifinals"
-                                          ? "Semifinaler"
-                                          : key === "bronzeFinal"
-                                          ? "Bronsefinale"
-                                          : "Finale"
+        <tbody>
+          {[
+            "roundOf32",
+            "roundOf16",
+            "quarterfinals",
+            "semifinals",
+            "bronzeFinal",
+            "final"
+          ].map((key) => (
+            <tr key={key}>
+              <td style={{ border: "1px solid #ccc", padding: 6 }}>
+                {key === "roundOf32"
+                  ? "16-delsfinaler"
+                  : key === "roundOf16"
+                  ? "8-delsfinaler"
+                  : key === "quarterfinals"
+                  ? "Kvartfinaler"
+                  : key === "semifinals"
+                  ? "Semifinaler"
+                  : key === "bronzeFinal"
+                  ? "Bronsefinale"
+                  : "Finale"}
+              </td>
 
-                                        }
-                                    </td>
+              {data.map((row) => {
+                const part3 = row.part3Json ? JSON.parse(row.part3Json) : null;
 
-                                    {data.map((row) => {
-                                        const part3 = row.part3Json
-                                            ? JSON.parse(row.part3Json)
-                                            : null;
+                return (
+                  <td
+                    key={row.participantId + key}
+                    style={{
+                      border: "1px solid #ccc",
+                      padding: 6,
+                      wordBreak: "break-word"
+                    }}
+                  >
+                    {part3 && part3[key]
+                      ? Array.isArray(part3[key])
+                        ? part3[key].map((team, i) => (
+                            <div key={i}>Kamp {i + 1}: {team}</div>
+                          ))
+                        : part3[key]
+                      : ""}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
 
-                                        return (
-                                            <td
-                                                key={row.participantId + key}
-                                                style={{
-                                                    border: "1px solid #ccc",
-                                                    padding: 6,
-                                                    wordBreak: "break-word"
-                                                }} >
+</div>   {/* avslutter <div style={{ padding: 20 }}> */}
+);        {/* avslutter return(...) */}
+}         {/* avslutter komponenten */}
 
-                                                {part3 && part3[key]
-                                                    ? Array.isArray(part3[key])
-                                                            ? part3[key].map((team, i) => (
-                                                                <div key={i}>
-                                                                    Kamp {i + 1}: {team}
-                                                                </div>
-                                                            ))
-                                                            : part3[key]
-                                                
-
-                                                    : ""}
-                                            </td>
-                                        );
-                                    })}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-        </div>
-    );
-}
