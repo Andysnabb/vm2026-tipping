@@ -437,7 +437,13 @@ export default function LivePage() {
     load();
 }, []);
 
-    const groupedMatches = useMemo(() => groupMatchesByRound(matches), [matches]);
+    // const groupedMatches = useMemo(() => groupMatchesByRound(matches), [matches]);
+    const groupedMatches = useMemo(() => {
+        return Object.entries(matches).map(([round, teams]) => ({
+            round,
+            teams
+        }));
+    }, [matches]);
 
     if (loading) {
         return <div style={styles.stateMessage}>Laster...</div>;
@@ -458,10 +464,10 @@ export default function LivePage() {
 
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>Grupper</h2>
-                {groups.map(group => (
-                    <div key={group.label} style={styles.groupBlock}>
-                        <h3 style={styles.groupTitle}>{group.name}</h3>
-                        <StandingTable rows={group.rows} />
+                {Object.entries(groups).map(([letter, rows]) => (
+                    <div key={letter} style={styles.groupBlock}>
+                        <h3 style={styles.groupTitle}>Gruppe {letter}</h3>
+                        <StandingTable rows={rows} />
                     </div>
                 ))}
             </section>
@@ -477,11 +483,7 @@ export default function LivePage() {
 
             <section style={styles.section}>
                 <h2 style={styles.sectionTitle}>Sluttspill</h2>
-                {matches.length === 0 ? (
-                    <div style={styles.emptyState}>Fant ingen sluttspillkamper.</div>
-                ) : (
-                    <KnockoutBracket groupedMatches={groupedMatches} />
-                )}
+                    {Object.keys(matches).length === 0 ? (
             </section>
         </div>
     );
