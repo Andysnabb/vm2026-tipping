@@ -169,7 +169,6 @@ export default function AnswersPage() {
                                         style={{
                                             border: "1px solid #ccc",
                                             padding: 6,
-                                            width: 120,
                                             wordBreak: "break-word"
                                         }}
                                     >
@@ -197,7 +196,6 @@ export default function AnswersPage() {
                                                 style={{
                                                     border: "1px solid #ccc",
                                                     padding: 6,
-                                                    width: 120,
                                                     wordBreak: "break-word"
                                                 }}
                                             >
@@ -235,7 +233,6 @@ export default function AnswersPage() {
                                         style={{
                                             border: "1px solid #ccc",
                                             padding: 6,
-                                            width: 120,
                                             fontWeight: "bold",
                                             backgroundColor: "#f5f5f5",
                                             wordBreak: "break-word",
@@ -254,7 +251,6 @@ export default function AnswersPage() {
                                     <td style={{
                                         border: "1px solid #ccc",
                                         padding: 6,
-                                        width: 120,
                                         fontWeight: "bold",
                                         backgroundColor : "#f5f5f5",
                                         wordBreak: "break-word",
@@ -306,7 +302,7 @@ export default function AnswersPage() {
                       <table className="answers-table">
                         <thead>
                             <tr>
-                                <th style={{ border: "1px solid #ccc", padding: 6, width: 120 }}>
+                                <th style={{ border: "1px solid #ccc", padding: 6 }}>
                                     Runde
                                 </th>
 
@@ -316,7 +312,6 @@ export default function AnswersPage() {
                                         style={{
                                             border: "1px solid #ccc",
                                             padding: 6,
-                                            width: 120,
                                             fontWeight: "bold",
                                             backgroundColor : "#f5f5f5",
                                             wordBreak: "break-word"
