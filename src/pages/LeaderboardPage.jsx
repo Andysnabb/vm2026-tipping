@@ -106,12 +106,17 @@ async function fetchExternalLiveData() {
 }
 
 async function fetchLiveDataFromProxy() {
+    console.log("DEBUG fetchLiveDataFromProxy CALLED");
+
     try {
         // Hent standings + bracket parallelt fra backend-proxyen
         const [standingsRes, bracketRes] = await Promise.all([
             fetch(`${API_BASE}?action=liveParsed`),
             fetch(`${API_BASE}?action=liveBracketParsed`)
         ]);
+
+        console.log("DEBUG standingsRes.ok:", standingsRes.ok);
+        console.log("DEBUG bracketRes.ok:", bracketRes.ok);
 
         if (!standingsRes.ok) {
             throw new Error(`Proxy standings-feil: ${standingsRes.status}`);
@@ -120,29 +125,42 @@ async function fetchLiveDataFromProxy() {
             throw new Error(`Proxy bracket-feil: ${bracketRes.status}`);
         }
 
+        // 🔥 EXACT PLACE TO LOG RAW JSON
         const standingsRaw = await standingsRes.json();
         const bracketRaw = await bracketRes.json();
+
+        console.log("DEBUG standingsRaw:", standingsRaw);
+        console.log("DEBUG bracketRaw:", bracketRaw);
 
         // Backend-proxyen returnerer:
         // { ok: true, source: "...", data: {...} }
         const standings = standingsRaw?.data;
         const bracket = bracketRaw?.data;
 
+        console.log("DEBUG extracted standings:", standings);
+        console.log("DEBUG extracted bracket:", bracket);
+
         if (!standings || !bracket) {
+            console.log("DEBUG ERROR: standings or bracket missing data field");
             throw new Error("Proxy-data mangler 'data'-felt");
         }
 
-        // Returner i nøyaktig det formatet LeaderboardPage bruker
-        return {
+        // 🔥 EXACT PLACE TO LOG WHAT WE RETURN
+        const result = {
             groups: standings.groups || {},
             knockout: bracket.knockout || {}
         };
+
+        console.log("DEBUG fetchLiveDataFromProxy RETURN:", result);
+
+        return result;
 
     } catch (err) {
         console.error("Feil ved henting av proxy-live-data:", err);
         return { groups: {}, knockout: {} };
     }
 }
+
 
 function safeJsonParse(value, fallback = null) { 
     if (!value) return fallback; 
@@ -349,7 +367,7 @@ export default function LeaderboardPage() {
     const sortedData = useMemo(() => { 
         return [...data].map(row => {
             const parsedPart1 = safeJsonParse(row.part1Json || row.part1, { groups: {} });
-            console.log("DEBUG parsedPart1 for", row.name, parsedPart1);
+            // console.log("DEBUG parsedPart1 for", row.name, parsedPart1);
 
             const p1 = pointsPart1(parsedPart1, actual); 
             const p2 = pointsPart2(row, actual); 
