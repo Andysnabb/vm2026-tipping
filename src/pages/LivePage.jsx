@@ -439,12 +439,15 @@ export default function LivePage() {
 
     // const groupedMatches = useMemo(() => groupMatchesByRound(matches), [matches]);
     const groupedMatches = useMemo(() => {
-        return Object.entries(matches).map(([round, teams]) => ({
-            round,
-            teams
-        }));
+        return {
+            r32: matches.r32 || [],
+            r16: matches.r16 || [],
+            qf: matches.qf || [],
+            sf: matches.sf || [],
+            f: matches.f || []
+        };
     }, [matches]);
-    
+
     if (loading) {
         return <div style={styles.stateMessage}>Laster...</div>;
     }
