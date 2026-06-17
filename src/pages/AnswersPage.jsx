@@ -213,7 +213,7 @@ export default function AnswersPage() {
                         </tbody>
                     </table>
                 </div>
-            ))
+            ))}
             )}
             {view === "part2" && (
                 <div>
