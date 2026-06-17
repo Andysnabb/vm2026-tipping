@@ -110,6 +110,45 @@ tr:hover td {
 }
 
 /* === SVAR === */
+/* === SCROLL WRAPPER FOR BREDE TABELLER === */
+.table-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* === RESPONSIV OG LESBAR ANSWERS-TABELL === */
+.answers-table {
+  width: max-content;   /* lar tabellen være bredere enn skjermen */
+  min-width: 100%;      /* men aldri smalere enn skjermen */
+  border-collapse: collapse;
+  background: white;
+}
+
+/* celler og header */
+.answers-table th,
+.answers-table td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  color: #111;
+}
+
+/* header */
+.answers-table th {
+  background: #e0e0e0;
+  font-weight: 600;
+}
+
+/* zebra-striper */
+.answers-table tr:nth-child(even) td {
+  background: #f5f5f5;
+}
+
+/* første kolonne (radnummer / labels) */
 .answers-table td:first-child,
 .answers-table th:first-child {
   background: #e5e7eb;
@@ -134,4 +173,12 @@ input, select {
 /* === SMÅTEKST === */
 small {
   color: #666;
+}
+/* === SCROLL WRAPPER FOR BREDE TABELLER === */
+.table-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
 }
