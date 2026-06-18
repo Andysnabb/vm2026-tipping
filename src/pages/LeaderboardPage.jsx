@@ -543,30 +543,32 @@ export default function LeaderboardPage() {
             )} 
 
             {/* Rangeringstabell */}
-            <table style={{ borderCollapse: "collapse", width: "100%", marginTop: 10 }}> 
-                <thead> 
-                    <tr> 
-                        <th style={{ border: "1px solid #ccc", padding: 8, width: 40, backgroundColor: "#eaeaea" }}>Plass</th> 
-                        <th style={{ border: "1px solid #ccc", padding: 8, backgroundColor: "#eaeaea", textAlign: "left" }}>Navn</th> 
-                        <th style={{ border: "1px solid #ccc", padding: 8, width: 60, backgroundColor: "#eaeaea" }}>Del 1</th> 
-                        <th style={{ border: "1px solid #ccc", padding: 8, width: 60, backgroundColor: "#eaeaea" }}>Del 2</th> 
-                        <th style={{ border: "1px solid #ccc", padding: 8, width: 60, backgroundColor: "#eaeaea" }}>Del 3</th> 
-                        <th style={{ border: "1px solid #ccc", padding: 8, width: 80, backgroundColor: "#eaeaea", fontWeight: "bold" }}>Total</th> 
-                    </tr> 
-                </thead> 
-                <tbody> 
-                    {sortedData.map((player, index) => ( 
-                        <tr key={player.id || index} style={{ backgroundColor: index % 2 === 0 ? "#fff" : "#f9f9f9" }}> 
-                            <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "center", fontWeight: "bold" }}>{index + 1}</td> 
-                            <td style={{ border: "1px solid #ccc", padding: 8 }}>{player.name || "Ukjent"}</td> 
-                            <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "center" }}>{player.p1} p</td> 
-                            <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "center" }}>{player.p2} p</td> 
-                            <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "center" }}>{player.p3} p</td> 
-                            <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "center", fontWeight: "bold", backgroundColor: "#f0fdf4" }}>{player.total} p</td> 
+            <div style={{ overflowX: "auto", maxWidth: "100%" }}>
+                <table style={{ borderCollapse: "collapse", width: "100%", marginTop: 10 }}> 
+                    <thead> 
+                        <tr> 
+                            <th style={{ border: "1px solid #ccc", padding: 8, width: 40, backgroundColor: "#eaeaea" }}>Plass</th> 
+                            <th style={{ border: "1px solid #ccc", padding: 8, backgroundColor: "#eaeaea", textAlign: "left" }}>Navn</th> 
+                            <th style={{ border: "1px solid #ccc", padding: 8, width: 60, backgroundColor: "#eaeaea" }}>Del 1</th> 
+                            <th style={{ border: "1px solid #ccc", padding: 8, width: 60, backgroundColor: "#eaeaea" }}>Del 2</th> 
+                            <th style={{ border: "1px solid #ccc", padding: 8, width: 60, backgroundColor: "#eaeaea" }}>Del 3</th> 
+                            <th style={{ border: "1px solid #ccc", padding: 8, width: 80, backgroundColor: "#eaeaea", fontWeight: "bold" }}>Total</th> 
                         </tr> 
-                    ))} 
-                </tbody> 
-            </table> 
+                    </thead> 
+                    <tbody> 
+                        {sortedData.map((player, index) => ( 
+                            <tr key={player.id || index} style={{ backgroundColor: index % 2 === 0 ? "#fff" : "#f9f9f9" }}> 
+                                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "center", fontWeight: "bold" }}>{index + 1}</td> 
+                                <td style={{ border: "1px solid #ccc", padding: 8 }}>{player.name || "Ukjent"}</td> 
+                                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "center" }}>{player.p1} p</td> 
+                                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "center" }}>{player.p2} p</td> 
+                                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "center" }}>{player.p3} p</td> 
+                                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "center", fontWeight: "bold", backgroundColor: "#f0fdf4" }}>{player.total} p</td> 
+                            </tr> 
+                        ))} 
+                    </tbody> 
+                </table> 
+            </div>
         </div> 
     ); 
 }
