@@ -380,7 +380,7 @@ export default function AnswersPage() {
   </div>
 )}
 
-</div>   {/* avslutter <div style={{ padding: 20 }}> */}
-);        {/* avslutter return(...) */}
-}         {/* avslutter komponenten */}
+</div>   
+);
+}
 
