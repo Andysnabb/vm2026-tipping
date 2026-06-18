@@ -544,7 +544,7 @@ export default function LeaderboardPage() {
 
             {/* Rangeringstabell */}
             <div style={{ overflowX: "auto", maxWidth: "100%" }}>
-                <table style={{ borderCollapse: "collapse", width: "100%", marginTop: 10 }}> 
+                <table className="leaderboard-table" style={{ borderCollapse: "collapse", width: "100%", marginTop: 10 }}> 
                     <thead> 
                         <tr> 
                             <th style={{ border: "1px solid #ccc", padding: 8, width: 40, backgroundColor: "#eaeaea" }}>Plass</th> 
