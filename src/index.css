@@ -161,6 +161,55 @@ tr:hover td {
   font-weight: bold;
 }
 
+.leaderboard-table th {
+  color: #000 !important;
+}
+
+/* Wrapper */
+.leaderboard-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 10px 0;
+}
+
+/* Tabell */
+.leaderboard-table {
+  border-collapse: collapse;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Header */
+.leaderboard-table th {
+  background: linear-gradient(90deg, #0033A0, #D50032);
+  color: #fff !important;
+  padding: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Celler */
+.leaderboard-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/* Zebra-effekt */
+.leaderboard-table tr:nth-child(even) {
+  background: #F5F7FA;
+}
+
+/* Total-poeng */
+.leaderboard-table td.total {
+  background: #FFD70033;
+  font-weight: bold;
+  color: #0033A0;
+}
+
 /* === INPUTS === */
 input, select {
   padding: 6px;
