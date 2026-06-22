@@ -261,12 +261,15 @@ export default function AnswersPage() {
                                     ? JSON.parse(row.part1Json)
                                     : null;
                                 
-                                  console.log("DEBUG DEL1:", {
-                                    group,
-                                    pos,
-                                    teamName: part1?.groups?.[group]?.[pos] || "",
-                                    actualGroup: actual?.groups?.[group]
-                                  });
+                                  console.log("COMPARE:", {
+                                      group,
+                                      pos,
+                                      teamName,
+                                      actualTeam: actualGroup[pos]?.team,
+                                      equal:
+                                        actualGroup[pos]?.team?.trim().toLowerCase() ===
+                                        teamName?.trim().toLowerCase()
+                                    });
                                 
                                   return (
                                     <td
