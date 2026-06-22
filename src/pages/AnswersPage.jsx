@@ -8,6 +8,15 @@ export default function AnswersPage() {
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState("part1");
 
+    // Ny state for fasit (Del 1 + Del 2 + Del 3)
+    const [actual, setActual] = useState(null);
+    
+    // Om fasit ikke kunne hentes
+    const [actualError, setActualError] = useState(false);
+    
+    // Om fasit fortsatt lastes
+    const [loadingActual, setLoadingActual] = useState(true);
+
     // 1. SETT TIDSPUNKTET FOR NÅR SIDEN SKAL ÅPNES HER
     // Format: ÅÅÅÅ-MM-DDTHH:MM:SS (f.eks. 15. juli kl. 18:00)
     const LANSERINGS_DATO = new Date("2026-06-11T21:00:00");
@@ -32,30 +41,60 @@ export default function AnswersPage() {
 
     useEffect(() => {
         async function load() {
-            // Hvis siden er låst, trenger vi ikke hente data fra Google Sheets engang
             if (erLåst) {
                 setLoading(false);
                 return;
             }
-
+    
             if (!API_BASE) return;
-
+    
             setLoading(true);
-
-            const res = await fetch(`${API_BASE}?action=all`);
-            const result = await res.json();
-
-            if (result.ok) {
-                setData(result.data);
+            setLoadingActual(true);
+    
+            try {
+                // 1. Hent submissions
+                const res = await fetch(`${API_BASE}?action=all`);
+                const result = await res.json();
+    
+                if (result.ok) {
+                    setData(result.data);
+                }
+    
+                // 2. Hent fasit for Del 2 (Sheets)
+                const actualsRes = await fetch(`${API_BASE}?action=actuals`)
+                    .then(r => r.json())
+                    .catch(() => null);
+    
+                // 3. Hent live-data for Del 1 + Del 3
+                const liveRes = await fetch(`${API_BASE}?action=liveParsed`)
+                    .then(r => r.json())
+                    .catch(() => null);
+    
+                const bracketRes = await fetch(`${API_BASE}?action=liveBracketParsed`)
+                    .then(r => r.json())
+                    .catch(() => null);
+    
+                if (!actualsRes?.ok || !liveRes?.data || !bracketRes?.data) {
+                    setActualError(true);
+                    setActual(null);
+                } else {
+                    setActual({
+                        groups: liveRes.data.groups || {},
+                        part2: actualsRes.data.part2 || {},
+                        knockout: bracketRes.data.knockout || {}
+                    });
+                }
+            } catch (err) {
+                setActualError(true);
+                setActual(null);
             }
-            
-            console.log("RESULTAT:", result);
-
+    
             setLoading(false);
+            setLoadingActual(false);
         }
-
+    
         load();
-    }, [erLåst]); // Lagt til erLåst som dependency
+    }, [erLåst]);
 
     if (loading) {
         return <div>Laster...</div>;
@@ -98,6 +137,20 @@ export default function AnswersPage() {
     return (
         <div style={{ padding: 20 }}>
             <h1>Alle svar</h1>
+            {actualError && (
+                <div style={{
+                    padding: 10,
+                    background: "#fff3cd",
+                    border: "1px solid #ffeeba",
+                    borderRadius: 6,
+                    marginBottom: 20,
+                    color: "#856404",
+                    fontWeight: "bold"
+                }}>
+                    Fasit er ikke tilgjengelig akkurat nå. Markeringer er deaktivert.
+                </div>
+            )}
+
                 <div style={{ marginBottom: 20 }}>
 
                     <button
