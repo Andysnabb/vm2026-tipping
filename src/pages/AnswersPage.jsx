@@ -12,13 +12,18 @@ export default function AnswersPage() {
     const [actual, setActual] = useState(null);
 
     const isCorrectGroupPick = (groupLetter, pos, teamName) => {
-        if (!actual?.groups?.[groupLetter]) return false;
+        const group = actual?.groups?.[groupLetter];
+        if (!group) return false;
     
-        const actualTeam = actual.groups[groupLetter][pos]?.team;
+        const actualEntry = group[pos];
+        if (!actualEntry) return false;
+    
+        const actualTeam = actualEntry.team;
         if (!actualTeam) return false;
     
         return actualTeam.trim().toLowerCase() === teamName.trim().toLowerCase();
     };
+
 
     // Om fasit ikke kunne hentes
     const [actualError, setActualError] = useState(false);
