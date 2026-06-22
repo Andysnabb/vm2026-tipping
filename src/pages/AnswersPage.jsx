@@ -17,6 +17,10 @@ export default function AnswersPage() {
     // Om fasit fortsatt lastes
     const [loadingActual, setLoadingActual] = useState(true);
 
+    console.log("ACTUALS RES:", actualsRes);
+    console.log("LIVE RES:", liveRes);
+    console.log("BRACKET RES:", bracketRes);
+
     // 1. SETT TIDSPUNKTET FOR NÅR SIDEN SKAL ÅPNES HER
     // Format: ÅÅÅÅ-MM-DDTHH:MM:SS (f.eks. 15. juli kl. 18:00)
     const LANSERINGS_DATO = new Date("2026-06-11T21:00:00");
