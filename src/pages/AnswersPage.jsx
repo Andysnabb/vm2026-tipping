@@ -258,16 +258,16 @@ export default function AnswersPage() {
                 
                                 {data.map((row) => {
                                   const part1 = row.part1Json
-                                      console.log("DEBUG DEL1:", {
-                                          group,
-                                          pos,
-                                          teamName: part1?.groups?.[group]?.[pos] || "",
-                                          actualGroup: actual?.groups?.[group]
-                                        });
-
                                     ? JSON.parse(row.part1Json)
                                     : null;
-                
+                                
+                                  console.log("DEBUG DEL1:", {
+                                    group,
+                                    pos,
+                                    teamName: part1?.groups?.[group]?.[pos] || "",
+                                    actualGroup: actual?.groups?.[group]
+                                  });
+                                
                                   return (
                                     <td
                                       key={row.participantId + pos}
