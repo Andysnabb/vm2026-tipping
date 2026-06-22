@@ -88,9 +88,9 @@ export default function AnswersPage() {
                     .then(r => r.json())
                     .catch(() => null);
                             
-                console.log("ACTUALS RES:", actualsRes);
-                console.log("LIVE RES:", liveRes);
-                console.log("BRACKET RES:", bracketRes);
+                // console.log("ACTUALS RES:", actualsRes);
+                // console.log("LIVE RES:", liveRes);
+                // console.log("BRACKET RES:", bracketRes);
                             
                 if (!actualsRes?.ok || !liveRes?.ok || !bracketRes?.ok) {
                     setActualError(true);
@@ -258,6 +258,13 @@ export default function AnswersPage() {
                 
                                 {data.map((row) => {
                                   const part1 = row.part1Json
+                                      console.log("DEBUG DEL1:", {
+                                          group,
+                                          pos,
+                                          teamName: part1?.groups?.[group]?.[pos] || "",
+                                          actualGroup: actual?.groups?.[group]
+                                        });
+
                                     ? JSON.parse(row.part1Json)
                                     : null;
                 
