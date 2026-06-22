@@ -10,7 +10,16 @@ export default function AnswersPage() {
 
     // Ny state for fasit (Del 1 + Del 2 + Del 3)
     const [actual, setActual] = useState(null);
+
+    const isCorrectGroupPick = (groupLetter, pos, teamName) => {
+        if (!actual?.groups?.[groupLetter]) return false;
     
+        const actualTeam = actual.groups[groupLetter][pos]?.team;
+        if (!actualTeam) return false;
+    
+        return actualTeam.trim().toLowerCase() === teamName.trim().toLowerCase();
+    };
+
     // Om fasit ikke kunne hentes
     const [actualError, setActualError] = useState(false);
     
@@ -253,15 +262,19 @@ export default function AnswersPage() {
                                       style={{
                                         border: "1px solid #ccc",
                                         padding: 6,
-                                        wordBreak: "break-word"
+                                        wordBreak: "break-word",
+                                        backgroundColor:
+                                          actual &&
+                                          isCorrectGroupPick(
+                                            group,
+                                            pos,
+                                            part1?.groups?.[group]?.[pos] || ""
+                                          )
+                                            ? "#d4f8d4"
+                                            : "transparent"
                                       }}
                                     >
-                                      {part1 &&
-                                      part1.groups &&
-                                      part1.groups[group] &&
-                                      part1.groups[group][pos]
-                                        ? part1.groups[group][pos]
-                                        : ""}
+                                      {part1?.groups?.[group]?.[pos] || ""}
                                     </td>
                                   );
                                 })}
