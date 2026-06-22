@@ -74,7 +74,7 @@ export default function AnswersPage() {
                     .then(r => r.json())
                     .catch(() => null);
     
-                if (!actualsRes?.ok || !liveRes?.data || !bracketRes?.data) {
+                if (!actualsRes?.ok || !liveRes?.ok || !bracketRes?.ok) {
                     setActualError(true);
                     setActual(null);
                 } else {
