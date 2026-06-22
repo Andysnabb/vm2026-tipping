@@ -61,7 +61,7 @@ export default function AnswersPage() {
                 }
     
                 // 2. Hent fasit for Del 2 (Sheets)
-                const actualsRes = await fetch(`${API_BASE}?action=actuals`)
+                const actualsRes = await fetch(`${API_BASE}?action=getActuals`)
                     .then(r => r.json())
                     .catch(() => null);
     
