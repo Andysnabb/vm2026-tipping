@@ -261,14 +261,15 @@ export default function AnswersPage() {
                                     ? JSON.parse(row.part1Json)
                                     : null;
                                 
-                                  console.log("COMPARE:", {
+                                  const teamName = part1?.groups?.[group]?.[pos] || "";
+                                    console.log("COMPARE:", {
                                       group,
                                       pos,
                                       teamName,
-                                      actualTeam: actualGroup[pos]?.team,
+                                      actualTeam: actual?.groups?.[group]?.[pos]?.team,
                                       equal:
-                                        actualGroup[pos]?.team?.trim().toLowerCase() ===
-                                        teamName?.trim().toLowerCase()
+                                        actual?.groups?.[group]?.[pos]?.team?.trim().toLowerCase() ===
+                                        teamName.trim().toLowerCase()
                                     });
                                 
                                   return (
