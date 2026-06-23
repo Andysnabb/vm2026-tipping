@@ -221,16 +221,30 @@ function pointsPart2(row, actual) {
     let points = 0; 
     const actualPart2 = actual.part2 || {}; 
 
-    const questionFields = ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10_brazil", "q10_haiti"]; 
+    // Del 2 – vanlige spørsmål (2 poeng hver)
+    const questionFields = ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9"]; 
     questionFields.forEach((field) => { 
         if (matchesActual(part2?.[field], actualPart2?.[field])) points += 2; 
     }); 
 
+    // q10 – Brasil vs Haiti (2 poeng totalt, ikke 4)
+    const userBrazil = Number(part2?.q10_brazil ?? null);
+    const userHaiti = Number(part2?.q10_haiti ?? null);
+
+    const actualBrazil = Number(actualPart2?.q10_brazil ?? null);
+    const actualHaiti = Number(actualPart2?.q10_haiti ?? null);
+
+    if (userBrazil === actualBrazil && userHaiti === actualHaiti) {
+        points += 2; // riktig totalpoeng for q10
+    }
+
+    // m1, m2, m3 – 2 poeng hver
     ["m1", "m2", "m3"].forEach((field) => { 
         if (matchesActual(part2?.[field], actualPart2?.[field])) points += 2; 
     }); 
+
     return points; 
-} 
+}
 
 function pointsPart3(row, actual) { 
     const part3 = safeJsonParse(row.part3Json || row.part3, null); 
