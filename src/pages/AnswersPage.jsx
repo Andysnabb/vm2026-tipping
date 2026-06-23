@@ -26,24 +26,22 @@ export default function AnswersPage() {
     
     const isCorrectPart2 = (question, part2) => {
         if (!actual?.part2) return false;
+        if (!part2) return false;
     
         // Spesialtilfelle: q10 har to tall
         if (question === "q10") {
-            const userBrazil = (part2?.q10_brazil || "").toString().trim();
-            const userHaiti = (part2?.q10_haiti || "").toString().trim();
+            const userBrazil = (part2.q10_brazil ?? "").toString().trim();
+            const userHaiti = (part2.q10_haiti ?? "").toString().trim();
     
-            const actualBrazil = actual.part2.q10_brazil?.toString().trim();
-            const actualHaiti = actual.part2.q10_haiti?.toString().trim();
+            const actualBrazil = (actual.part2.q10_brazil ?? "").toString().trim();
+            const actualHaiti = (actual.part2.q10_haiti ?? "").toString().trim();
     
-            return (
-                userBrazil === actualBrazil &&
-                userHaiti === actualHaiti
-            );
+            return userBrazil === actualBrazil && userHaiti === actualHaiti;
         }
     
         // Vanlige spørsmål
-        const userAnswer = (part2?.[question] || "").trim().toLowerCase();
-        const actualAnswer = (actual.part2[question] || "").trim().toLowerCase();
+        const userAnswer = (part2[question] ?? "").toString().trim().toLowerCase();
+        const actualAnswer = (actual.part2[question] ?? "").toString().trim().toLowerCase();
     
         return userAnswer === actualAnswer;
     };
@@ -388,16 +386,15 @@ export default function AnswersPage() {
                                     fontSize: 13,
                                     lineHeight: 1.2,
                                     backgroundColor:
-                                      actual &&
-                                      isCorrectPart2(question, part2)
+                                      actual && isCorrectPart2(question, part2)
                                         ? "#d4f8d4"
                                         : "transparent"
                                   }}
                                 >
                                   {part2
                                     ? question === "q10"
-                                      ? `${part2.q10_brazil || ""} - ${part2.q10_haiti || ""}`
-                                      : part2[question] || ""
+                                      ? `${part2.q10_brazil ?? ""} - ${part2.q10_haiti ?? ""}`
+                                      : part2[question] ?? ""
                                     : ""}
                                 </td>
                               );
