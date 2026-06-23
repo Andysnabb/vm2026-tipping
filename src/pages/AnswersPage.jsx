@@ -45,6 +45,24 @@ export default function AnswersPage() {
     
         return userAnswer === actualAnswer;
     };
+    const isCorrectPart3 = (key, part3, index) => {
+        if (!actual?.part3) return false;
+        if (!part3) return false;
+    
+        const actualValue = actual.part3[key];
+    
+        // Hvis fasiten er en liste (roundOf32, roundOf16, quarterfinals, semifinals)
+        if (Array.isArray(actualValue)) {
+            const userTeam = (part3[key]?.[index] ?? "").toString().trim().toLowerCase();
+            const actualTeam = (actualValue[index] ?? "").toString().trim().toLowerCase();
+            return userTeam === actualTeam;
+        }
+    
+        // Hvis fasiten er én verdi (bronzeFinal, final)
+        const userTeam = (part3[key] ?? "").toString().trim().toLowerCase();
+        const actualTeam = (actualValue ?? "").toString().trim().toLowerCase();
+        return userTeam === actualTeam;
+    };
 
     // Om fasit ikke kunne hentes
     const [actualError, setActualError] = useState(false);
@@ -465,22 +483,47 @@ export default function AnswersPage() {
                 const part3 = row.part3Json ? JSON.parse(row.part3Json) : null;
 
                 return (
-                  <td
-                    key={row.participantId + key}
-                    style={{
-                      border: "1px solid #ccc",
-                      padding: 6,
-                      wordBreak: "break-word"
-                    }}
-                  >
-                    {part3 && part3[key]
-                      ? Array.isArray(part3[key])
-                        ? part3[key].map((team, i) => (
-                            <div key={i}>Kamp {i + 1}: {team}</div>
-                          ))
-                        : part3[key]
-                      : ""}
-                  </td>
+                <td
+                  key={row.participantId + key}
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: 6,
+                    wordBreak: "break-word"
+                  }}
+                >
+                  {part3 && part3[key]
+                    ? Array.isArray(part3[key])
+                      ? part3[key].map((team, i) => (
+                          <div
+                            key={i}
+                            style={{
+                              backgroundColor:
+                                actual && isCorrectPart3(key, part3, i)
+                                  ? "#d4f8d4"
+                                  : "transparent",
+                              padding: "2px 4px",
+                              borderRadius: 4
+                            }}
+                          >
+                            Kamp {i + 1}: {team}
+                          </div>
+                        ))
+                      : (
+                          <div
+                            style={{
+                              backgroundColor:
+                                actual && isCorrectPart3(key, part3)
+                                  ? "#d4f8d4"
+                                  : "transparent",
+                              padding: "2px 4px",
+                              borderRadius: 4
+                            }}
+                          >
+                            {part3[key]}
+                          </div>
+                        )
+                    : ""}
+                </td>
                 );
               })}
             </tr>
