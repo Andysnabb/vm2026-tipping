@@ -109,6 +109,9 @@ async function fetchLiveDataFromProxy() {
     // console.log("DEBUG fetchLiveDataFromProxy CALLED");
 
     try {
+        
+        throw new Error("TESTER FALLBACK");  // <-- HER
+
         const [standingsRes, bracketRes] = await Promise.all([
             fetch(`${API_BASE}?action=liveParsed`),
             fetch(`${API_BASE}?action=liveBracketParsed`)
