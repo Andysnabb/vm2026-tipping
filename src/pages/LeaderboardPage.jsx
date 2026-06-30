@@ -267,7 +267,9 @@ function pointsPart3(row, actual) {
     predictedRoundOf16.forEach(t => { if (actualRoundOf16.includes(t)) points += 2; }); 
     predictedQuarterfinals.forEach(t => { if (actualQuarterfinals.includes(t)) points += 3; }); 
     predictedSemifinals.forEach(t => { if (actualSemifinals.includes(t)) points += 4; });
-
+    
+    console.log("R16 predicted:", predictedRoundOf16);
+    console.log("R16 actual:", actualRoundOf16);
 
     return points; 
 } 
