@@ -256,14 +256,18 @@ function pointsPart3(row, actual) {
     const predictedRoundOf32 = Array.isArray(part3.roundOf32) ? part3.roundOf32.map(cleanText).filter(Boolean) : []; 
     const predictedRoundOf16 = Array.isArray(part3.roundOf16) ? part3.roundOf16.map(cleanText).filter(Boolean) : []; 
     const predictedQuarterfinals = Array.isArray(part3.quarterfinals) ? part3.quarterfinals.map(cleanText).filter(Boolean) : []; 
+    const predictedSemifinals = Array.isArray(part3.semifinals) ? part3.semifinals.map(cleanText).filter(Boolean) : []; 
 
     const actualRoundOf32 = Array.isArray(actual.knockout.r32) ? actual.knockout.r32.map(cleanText).filter(Boolean) : []; 
     const actualRoundOf16 = Array.isArray(actual.knockout.r16) ? actual.knockout.r16.map(cleanText).filter(Boolean) : []; 
     const actualQuarterfinals = Array.isArray(actual.knockout.qf) ? actual.knockout.qf.map(cleanText).filter(Boolean) : []; 
+    const actualSemifinals = Array.isArray(actual.knockout.sf) ? actual.knockout.sf.map(cleanText).filter(Boolean) : []
 
-    predictedRoundOf32.forEach(t => { if (actualRoundOf32.includes(t)) points += 1; }); 
+    // predictedRoundOf32.forEach(t => { if (actualRoundOf32.includes(t)) points += 1; }); 
     predictedRoundOf16.forEach(t => { if (actualRoundOf16.includes(t)) points += 2; }); 
     predictedQuarterfinals.forEach(t => { if (actualQuarterfinals.includes(t)) points += 3; }); 
+    predictedSemifinals.forEach(t => { if (actualSemifinals.includes(t)) points += 4; });
+
 
     return points; 
 } 
