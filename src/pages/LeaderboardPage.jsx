@@ -267,7 +267,7 @@ function pointsPart3(row, actual) {
     // -----------------------------
     // BRUKERENS TIPS
     // -----------------------------
-    const r16_pred = (part3.roundOf16 || []).map(cleanText).filter(Boolean);      // 8 lag
+    const r16_pred = (part3.roundOf32 || []).map(cleanText).filter(Boolean);      // 8 lag
     const qf_pred = (part3.quarterfinals || []).map(cleanText).filter(Boolean);   // 4 lag
     const sf_pred = (part3.semifinals || []).map(cleanText).filter(Boolean);      // 2 lag (finalelag)
     const winner_pred = cleanText(part3.final?.[0]);                              // vinner
