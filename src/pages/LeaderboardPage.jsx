@@ -106,7 +106,7 @@ async function fetchExternalLiveData() {
 }
 
 async function fetchLiveDataFromProxy() {
-    console.log("DEBUG fetchLiveDataFromProxy CALLED");
+    // console.log("DEBUG fetchLiveDataFromProxy CALLED");
 
     try {
         const [standingsRes, bracketRes] = await Promise.all([
@@ -114,8 +114,8 @@ async function fetchLiveDataFromProxy() {
             fetch(`${API_BASE}?action=liveBracketParsed`)
         ]);
 
-        console.log("DEBUG standingsRes.ok:", standingsRes.ok);
-        console.log("DEBUG bracketRes.ok:", bracketRes.ok);
+        // console.log("DEBUG standingsRes.ok:", standingsRes.ok);
+        // console.log("DEBUG bracketRes.ok:", bracketRes.ok);
 
         if (!standingsRes.ok) {
             throw new Error(`Proxy standings-feil: ${standingsRes.status}`);
@@ -127,17 +127,17 @@ async function fetchLiveDataFromProxy() {
         const standingsRaw = await standingsRes.json();
         const bracketRaw = await bracketRes.json();
 
-        console.log("DEBUG standingsRaw:", standingsRaw);
-        console.log("DEBUG bracketRaw:", bracketRaw);
+        // console.log("DEBUG standingsRaw:", standingsRaw);
+        // console.log("DEBUG bracketRaw:", bracketRaw);
 
         const standings = standingsRaw?.data;
         const bracket = bracketRaw?.data;
 
-        console.log("DEBUG extracted standings:", standings);
-        console.log("DEBUG extracted bracket:", bracket);
+        // console.log("DEBUG extracted standings:", standings);
+        // console.log("DEBUG extracted bracket:", bracket);
 
         if (!standings || !bracket) {
-            console.log("DEBUG ERROR: standings or bracket missing data field");
+            // console.log("DEBUG ERROR: standings or bracket missing data field");
             throw new Error("Proxy-data mangler 'data'-felt");
         }
 
@@ -146,7 +146,7 @@ async function fetchLiveDataFromProxy() {
             knockout: bracket.knockout || {}
         };
 
-        console.log("DEBUG fetchLiveDataFromProxy RETURN:", result);
+        // console.log("DEBUG fetchLiveDataFromProxy RETURN:", result);
 
         return result;
 
@@ -177,12 +177,17 @@ function matchesActual(predicted, actual) {
 // POENGBEREGNINGER
 // ============================================================================
 function pointsPart1(participantParsed, currentActual) {
-    console.log("DEBUG pointsPart1 currentActual.groups:", currentActual.groups);
+    // console.log("DEBUG pointsPart1 currentActual.groups:", currentActual.groups);
 
     if (!participantParsed?.groups || !currentActual?.groups) return 0;
     let score = 0;
 
-    const cleanText = (str) => String(str || "").trim().toLowerCase();
+    const cleanText = (str) => {
+        const s = String(str || "").trim().toLowerCase();
+        if (s.includes("winner")) return ""; // ignorer ikke-ferdige kamper
+        return s;
+    };
+    
     const cleanGroupKey = (key) => {
         const cleaned = String(key || "").trim().toUpperCase();
         if (cleaned.startsWith("GRUPPE ")) return cleaned.replace("GRUPPE ", "");
@@ -259,9 +264,9 @@ function pointsPart3(row, actual) {
     const predictedSemifinals = Array.isArray(part3.semifinals) ? part3.semifinals.map(cleanText).filter(Boolean) : []; 
 
     const actualRoundOf32 = Array.isArray(actual.knockout.r32) ? actual.knockout.r32.map(cleanText).filter(Boolean) : []; 
-    const actualRoundOf16 = Array.isArray(actual.knockout.r16) ? actual.knockout.r16.map(cleanText).filter(Boolean) : []; 
-    const actualQuarterfinals = Array.isArray(actual.knockout.qf) ? actual.knockout.qf.map(cleanText).filter(Boolean) : []; 
-    const actualSemifinals = Array.isArray(actual.knockout.sf) ? actual.knockout.sf.map(cleanText).filter(Boolean) : []
+    const actualRoundOf16 = Array.isArray(actual.knockout.qf) ? actual.knockout.qf.map(cleanText).filter(Boolean) : []; 
+    const actualQuarterfinals = Array.isArray(actual.knockout.sf) ? actual.knockout.sf.map(cleanText).filter(Boolean) : []; 
+    const actualSemifinals = Array.isArray(actual.knockout.f) ? actual.knockout.f.map(cleanText).filter(Boolean) : []
 
     // predictedRoundOf32.forEach(t => { if (actualRoundOf32.includes(t)) points += 1; }); 
     predictedRoundOf16.forEach(t => { if (actualRoundOf16.includes(t)) points += 2; }); 
