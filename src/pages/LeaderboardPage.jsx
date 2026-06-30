@@ -110,8 +110,6 @@ async function fetchLiveDataFromProxy() {
 
     try {
         
-        throw new Error("TESTER FALLBACK");  // <-- HER
-
         const [standingsRes, bracketRes] = await Promise.all([
             fetch(`${API_BASE}?action=liveParsed`),
             fetch(`${API_BASE}?action=liveBracketParsed`)
@@ -135,13 +133,15 @@ async function fetchLiveDataFromProxy() {
 
         const standings = standingsRaw?.data;
         const bracket = bracketRaw?.data;
-
-        // console.log("DEBUG extracted standings:", standings);
-        // console.log("DEBUG extracted bracket:", bracket);
-
+        
+        // ✅ GODKJENN fallback også
         if (!standings || !bracket) {
-            // console.log("DEBUG ERROR: standings or bracket missing data field");
-            throw new Error("Proxy-data mangler 'data'-felt");
+            console.warn("Proxy-data mangler data – bruker fallback hvis tilgjengelig");
+        
+            return {
+                groups: standingsRaw?.data?.groups || {},
+                knockout: bracketRaw?.data?.knockout || {}
+            };
         }
 
         const result = {
