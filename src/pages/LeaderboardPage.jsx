@@ -253,6 +253,7 @@ function pointsPart2(row, actual) {
 
 function pointsPart3(row, actual) {
     const part3 = safeJsonParse(row.part3Json || row.part3, null); 
+    console.log("PART3:", part3);
     if (!part3 || !actual.knockout) return 0; 
 
     let points = 0; 
