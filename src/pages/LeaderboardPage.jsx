@@ -284,8 +284,13 @@ function pointsPart3(row, actual) {
     // -----------------------------
     // 8-DEL (+2)
     // -----------------------------
+    const actualSet = new Set(r16_actual);
+    
+    console.log("ACTUAL R16:", r16_actual);
+    console.log("PREDICTED R16:", r16_pred);
+
     r16_pred.forEach(t => {
-        if (r16_actual.includes(t)) {
+        if (actualSet.has(t)) {
             points += 2;
         }
     });
