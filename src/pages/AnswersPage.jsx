@@ -46,22 +46,39 @@ export default function AnswersPage() {
         return userAnswer === actualAnswer;
     };
     const isCorrectPart3 = (key, part3, index) => {
-        if (!actual?.part3) return false;
+        if (!actual?.knockout) return false;
         if (!part3) return false;
     
-        const actualValue = actual.part3[key];
+        const cleanText = (str) => {
+            const s = String(str || "").trim().toLowerCase();
+            if (!s || s.includes("winner")) return "";
+            return s;
+        };
     
-        // Hvis fasiten er en liste (roundOf32, roundOf16, quarterfinals, semifinals)
-        if (Array.isArray(actualValue)) {
-            const userTeam = (part3[key]?.[index] ?? "").toString().trim().toLowerCase();
-            const actualTeam = (actualValue[index] ?? "").toString().trim().toLowerCase();
-            return userTeam === actualTeam;
+        // Hent riktig fasit basert på runde
+        let actualList = [];
+    
+        if (key === "roundOf16") {
+            actualList = (actual.knockout.r16 || []);
+        }
+        else if (key === "quarterfinals") {
+            actualList = (actual.knockout.qf || []);
+        }
+        else if (key === "semifinals") {
+            actualList = (actual.knockout.sf || []);
+        }
+        else if (key === "final") {
+            actualList = (actual.knockout.f || []);
         }
     
-        // Hvis fasiten er én verdi (bronzeFinal, final)
-        const userTeam = (part3[key] ?? "").toString().trim().toLowerCase();
-        const actualTeam = (actualValue ?? "").toString().trim().toLowerCase();
-        return userTeam === actualTeam;
+        // Rens fasit
+        const cleanActual = actualList.map(cleanText).filter(Boolean);
+    
+        // Rens brukerens lag
+        const userTeam = cleanText(part3[key]?.[index]);
+    
+        // ✅ RIKTIG LOGIKK: finnes i lista
+        return cleanActual.includes(userTeam);
     };
 
     // Om fasit ikke kunne hentes
