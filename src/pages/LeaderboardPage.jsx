@@ -403,6 +403,7 @@ export default function LeaderboardPage() {
     
             // SUBMISSIONS
             const submissionsJson = await submissionsRes.json(); 
+            console.log("SUBMISSIONS JSON:", submissionsJson);
             if (submissionsJson?.ok && Array.isArray(submissionsJson.data)) { 
                 setData(submissionsJson.data); 
             } else if (Array.isArray(submissionsJson)) {
