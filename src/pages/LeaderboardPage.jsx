@@ -324,12 +324,43 @@ function pointsPart3(row, actual) {
     }
 
     // -----------------------------
-    // VINNER (+10)
+    // FINALE + VINNER (KORREKT LOGIKK)
     // -----------------------------
-    if (actual.knockout.winner) {
+    if (
+        actual.knockout.winner &&
+        actual.knockout.runnerUp &&
+        f_pred.length === 2
+    ) {
         const actualWinner = cleanText(actual.knockout.winner);
-        if (winner_pred === actualWinner) {
+        const actualRunnerUp = cleanText(actual.knockout.runnerUp);
+    
+        const predWinner = winner_pred;
+        const predRunnerUp = f_pred.find(t => t !== predWinner);
+    
+        const hasCorrectWinner = predWinner === actualWinner;
+        const hasCorrectRunnerUp = f_pred.includes(actualRunnerUp);
+    
+        // ✅ RIKTIG BEGGE
+        if (hasCorrectWinner && hasCorrectRunnerUp) {
+            points += 15; // 10 + 5
+        }
+    
+        // ✅ RIKTIGE MEN BYTTET
+        else if (
+            f_pred.includes(actualWinner) &&
+            f_pred.includes(actualRunnerUp)
+        ) {
+            points += 8;
+        }
+    
+        // ✅ KUN RIKTIG VINNER
+        else if (hasCorrectWinner) {
             points += 10;
+        }
+    
+        // ✅ KUN RIKTIG TAPER
+        else if (hasCorrectRunnerUp) {
+            points += 5;
         }
     }
 
