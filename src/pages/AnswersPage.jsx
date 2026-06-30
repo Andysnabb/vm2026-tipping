@@ -55,19 +55,31 @@ export default function AnswersPage() {
             return s;
         };
     
-        // Hent riktig fasit basert på runde
         let actualList = [];
     
-        if (key === "roundOf16") {
+        if (key === "roundOf32") {
             actualList = (actual.knockout.r16 || []);
         }
-        else if (key === "quarterfinals") {
+    
+        else if (key === "roundOf16") {
+            // ❗IKKE marker før qf faktisk har ekte lag
+            if (!(actual.knockout.qf || []).some(t => t && !t.includes("Winner"))) {
+                return false;
+            }
             actualList = (actual.knockout.qf || []);
         }
-        else if (key === "semifinals") {
+    
+        else if (key === "quarterfinals") {
+            if (!(actual.knockout.sf || []).some(t => t && !t.includes("Winner"))) {
+                return false;
+            }
             actualList = (actual.knockout.sf || []);
         }
-        else if (key === "final") {
+    
+        else if (key === "semifinals") {
+            if (!(actual.knockout.f || []).some(t => t && !t.includes("Winner"))) {
+                return false;
+            }
             actualList = (actual.knockout.f || []);
         }
     
@@ -77,9 +89,9 @@ export default function AnswersPage() {
         // Rens brukerens lag
         const userTeam = cleanText(part3[key]?.[index]);
     
-        // ✅ RIKTIG LOGIKK: finnes i lista
         return cleanActual.includes(userTeam);
     };
+
 
     // Om fasit ikke kunne hentes
     const [actualError, setActualError] = useState(false);
