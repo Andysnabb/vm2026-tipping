@@ -257,93 +257,79 @@ function pointsPart3(row, actual) {
 
     let points = 0; 
 
-    // Rens tekst + fjern "Winner ..."
     const cleanText = (str) => {
-        const s = String(str || "").trim().toLowerCase();
-        if (!s || s.includes("winner")) return "";
-        return s;
+        return String(str || "")
+            .toLowerCase()
+            .replace(/\u00a0/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
     };
 
     // -----------------------------
     // BRUKERENS TIPS
     // -----------------------------
-    const r16_pred = (part3.roundOf32 || []).map(cleanText).filter(Boolean);      // 8 lag
-    const qf_pred = (part3.quarterfinals || []).map(cleanText).filter(Boolean);   // 4 lag
-    const sf_pred = (part3.semifinals || []).map(cleanText).filter(Boolean);      // 2 lag (finalelag)
-    const winner_pred = cleanText(part3.final?.[0]);                              // vinner
-    const bronze_pred = cleanText(part3.bronze?.[0]);                             // bronse
+    const r16_pred = (part3.roundOf32 || []).map(cleanText).filter(Boolean);      // lag i 8-dels
+    const qf_pred  = (part3.roundOf16 || []).map(cleanText).filter(Boolean);      // lag i kvart
+    const sf_pred  = (part3.quarterfinals || []).map(cleanText).filter(Boolean);  // lag i semi
+    const f_pred   = (part3.semifinals || []).map(cleanText).filter(Boolean);     // lag i finale
+    const winner_pred = cleanText(part3.final?.[0]);
+    const bronze_pred = cleanText(part3.bronze?.[0]);
 
     // -----------------------------
-    // FAKTISK DATA
+    // FASIT
     // -----------------------------
-    const r16_actual = (actual.knockout.r16 || []).map(cleanText).filter(Boolean);
-    const qf_actual = (actual.knockout.qf || []).map(cleanText).filter(Boolean);
-    const sf_actual = (actual.knockout.sf || []).map(cleanText).filter(Boolean);
-    const f_actual = (actual.knockout.f || []).map(cleanText).filter(Boolean);
+    const r16_actual = (actual.knockout.r16 || []).map(cleanText).filter(t => t && !t.includes("winner"));
+    const qf_actual  = (actual.knockout.qf || []).map(cleanText).filter(t => t && !t.includes("winner"));
+    const sf_actual  = (actual.knockout.sf || []).map(cleanText).filter(t => t && !t.includes("winner"));
+    const f_actual   = (actual.knockout.f || []).map(cleanText).filter(t => t && !t.includes("winner"));
+
+    const r16_set = new Set(r16_actual);
+    const qf_set  = new Set(qf_actual);
+    const sf_set  = new Set(sf_actual);
+    const f_set   = new Set(f_actual);
 
     // -----------------------------
     // 8-DEL (+2)
+    // lag i 8-dels
     // -----------------------------
-    const actualSet = new Set(r16_actual);
-    
-    console.log("ACTUAL R16:", r16_actual);
-    console.log("PREDICTED R16:", r16_pred);
-
     r16_pred.forEach(t => {
-        if (actualSet.has(t)) {
-            points += 2;
-        }
+        if (r16_set.has(t)) points += 2;
     });
 
     // -----------------------------
     // KVARTFINAL (+3)
-    // (kun når vi har ekte lag – ikke bare "Winner ...")
+    // lag i kvartfinale
     // -----------------------------
-    if (qf_actual.length > 0) {
-        qf_pred.forEach(t => {
-            if (qf_actual.includes(t)) {
-                points += 3;
-            }
-        });
-    }
+    qf_pred.forEach(t => {
+        if (qf_set.has(t)) points += 3;
+    });
 
     // -----------------------------
     // SEMIFINAL (+4)
+    // lag i semifinale
     // -----------------------------
-    if (sf_actual.length > 0) {
-        sf_pred.forEach(t => {
-            if (sf_actual.includes(t)) {
-                points += 4;
+    sf_pred.forEach(t => {
+        if (sf_set.has(t)) points += 4;
+    });
+
+    // -----------------------------
+    // FINALE (lag i finalen)
+    // -----------------------------
+    if (f_actual.length > 0) {
+        f_pred.forEach(t => {
+            if (f_set.has(t)) {
+                points += 5; // finalist
             }
         });
     }
 
     // -----------------------------
-    // FINALE / VINNER
-    // (gir først poeng når ekte data finnes)
+    // VINNER (+10)
     // -----------------------------
-    if (actual.knockout.winner && actual.knockout.runnerUp) {
+    if (actual.knockout.winner) {
         const actualWinner = cleanText(actual.knockout.winner);
-        const actualRunnerUp = cleanText(actual.knockout.runnerUp);
-
-        // +10 riktig vinner
         if (winner_pred === actualWinner) {
             points += 10;
-        }
-
-        // +5 riktig finalist (2. plass)
-        if (sf_pred.includes(actualRunnerUp)) {
-            points += 5;
-        }
-
-        // +8 hvis finalistene riktige men byttet
-        if (
-            sf_pred.length === 2 &&
-            sf_pred.includes(actualWinner) &&
-            sf_pred.includes(actualRunnerUp) &&
-            winner_pred !== actualWinner
-        ) {
-            points += 8;
         }
     }
 
@@ -359,7 +345,6 @@ function pointsPart3(row, actual) {
 
     return points; 
 }
-
 
 export default function LeaderboardPage() { 
     const [data, setData] = useState([]); 
