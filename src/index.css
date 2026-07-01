@@ -231,3 +231,93 @@ small {
   padding-bottom: 8px;
   -webkit-overflow-scrolling: touch;
 }
+/* === MOBIL: lås Plass + Navn i poengtavlen === */
+@media (max-width: 640px) {
+  .leaderboard-wrapper {
+    overflow-x: auto;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .leaderboard-table {
+    width: max-content;
+    min-width: 560px;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .leaderboard-table th,
+  .leaderboard-table td {
+    white-space: nowrap;
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+
+  /* Kolonne 1: Plass */
+  .leaderboard-table th:nth-child(1),
+  .leaderboard-table td:nth-child(1) {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    width: 52px;
+    min-width: 52px;
+    max-width: 52px;
+    text-align: center;
+  }
+
+  /* Kolonne 2: Navn */
+  .leaderboard-table th:nth-child(2),
+  .leaderboard-table td:nth-child(2) {
+    position: sticky;
+    left: 52px;
+    z-index: 3;
+    width: 140px;
+    min-width: 140px;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Bakgrunn på låste celler */
+  .leaderboard-table td:nth-child(1),
+  .leaderboard-table td:nth-child(2) {
+    background: #ffffff;
+  }
+
+  .leaderboard-table tr:nth-child(even) td:nth-child(1),
+  .leaderboard-table tr:nth-child(even) td:nth-child(2) {
+    background: #f5f7fa;
+  }
+
+  .leaderboard-table tr:hover td:nth-child(1),
+  .leaderboard-table tr:hover td:nth-child(2) {
+    background: #e5f0ff;
+  }
+
+  /* Header over vanlige celler */
+  .leaderboard-table th:nth-child(1),
+  .leaderboard-table th:nth-child(2) {
+    z-index: 4;
+    background: linear-gradient(90deg, #0033A0, #D50032);
+    color: #fff !important;
+  }
+
+  /* Skillelinje etter Navn */
+  .leaderboard-table th:nth-child(2),
+  .leaderboard-table td:nth-child(2) {
+    box-shadow: 4px 0 6px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Poengkolonner */
+  .leaderboard-table th:nth-child(n+3),
+  .leaderboard-table td:nth-child(n+3) {
+    min-width: 72px;
+    text-align: center;
+  }
+
+  /* Total-kolonnen */
+  .leaderboard-table th:nth-child(6),
+  .leaderboard-table td:nth-child(6) {
+    min-width: 80px;
+  }
+}
