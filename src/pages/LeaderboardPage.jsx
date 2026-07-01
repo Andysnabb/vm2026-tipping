@@ -401,7 +401,7 @@ export default function LeaderboardPage() {
                 // await fetchLiveDataFromProxy()
             ]);
             
-            console.log("LIVE DATA:", liveData),
+            console.log("LIVE DATA:", liveData);
     
             // SUBMISSIONS
             const submissionsJson = await submissionsRes.json(); 
