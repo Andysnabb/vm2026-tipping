@@ -394,7 +394,7 @@ export default function LeaderboardPage() {
     async function loadLeaderboardData() { 
         setLoading(true); 
         try { 
-            const [submissionsRes, actualsRes, ] = await Promise.all([
+            const [submissionsRes, actualsRes, liveData] = await Promise.all([
                 fetch(`${API_BASE}?action=all`),
                 getActuals().catch(() => ({ ok: false, data: null })),
                 // USE_PROXY ? fetchLiveDataFromProxy() : fetchExternalLiveData()
@@ -418,9 +418,9 @@ export default function LeaderboardPage() {
     
             // LIVE (del 1 + del 3) – kommer nå fra proxy / external
             setActual({
-                groups: srv?.groups || {},
+                groups: liveData.groups || {},
                 part2: srv?.part2 || {},
-                knockout: srv?.knockout || {}
+                knockout: liveData.knockout || {}
             });
     
             setPart2Actual(srv?.part2 || {}); 
@@ -484,23 +484,6 @@ export default function LeaderboardPage() {
             return { ...row, p1, p2, p3, total };
         }).sort((a, b) => b.total - a.total); 
     }, [data, actual]); 
-
-    async function handleUpdateLive() {
-        setLoading(true);
-    
-        try {
-            // 1. kall proxy (dette trigger lagring i Apps Script)
-            await fetchLiveDataFromProxy();
-    
-            // 2. reload fra backend
-            await loadLeaderboardData();
-    
-        } catch (err) {
-            console.error("Feil ved oppdatering:", err);
-        } finally {
-            setLoading(false);
-        }
-    }
     
     if (loading) { 
         return <div style={{ padding: 20, textAlign: "center", fontFamily: "sans-serif" }}>Oppdaterer ledertavle med live-resultater...</div>; 
@@ -515,7 +498,7 @@ export default function LeaderboardPage() {
                         Del 1 og 3 oppdateres live. Del 2 settes av admin.
                     </div>
                 </div>
-                <button onClick={handleUpdateLive} style={{ padding: "6px 12px", cursor: "pointer" }}>
+                <button onClick={loadLeaderboardData} style={{ padding: "6px 12px", cursor: "pointer" }}>
                     Oppdater live
                 </button>
             </div>
