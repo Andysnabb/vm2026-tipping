@@ -395,6 +395,7 @@ export default function LeaderboardPage() {
         setLoading(true); 
         try { 
             const [submissionsRes, actualsRes, liveData] = await Promise.all([
+                console.log("LIVE DATA:", liveData);
                 fetch(`${API_BASE}?action=all`),
                 getActuals().catch(() => ({ ok: false, data: null })),
                 USE_PROXY ? fetchLiveDataFromProxy() : fetchExternalLiveData()
