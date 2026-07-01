@@ -39,6 +39,28 @@ export default function AnswersPage() {
             return userBrazil === actualBrazil && userHaiti === actualHaiti;
         }
     
+        const normalize = (value) =>
+            String(value ?? "").trim().toLowerCase();
+    
+        const toList = (value) => {
+            if (Array.isArray(value)) {
+                return value.map(normalize).filter(Boolean);
+            }
+    
+            const normalized = normalize(value);
+            return normalized ? [normalized] : [];
+        };
+    
+        const userAnswers = toList(part2[question]);
+        const actualAnswers = toList(actual.part2[question]);
+    
+        if (userAnswers.length === 0 || actualAnswers.length === 0) {
+            return false;
+        }
+    
+        return userAnswers.some(answer => actualAnswers.includes(answer));
+    };
+    
         // Vanlige spørsmål
         const userAnswer = (part2[question] ?? "").toString().trim().toLowerCase();
         const actualAnswer = (actual.part2[question] ?? "").toString().trim().toLowerCase();
