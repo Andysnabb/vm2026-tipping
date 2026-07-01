@@ -129,6 +129,7 @@ async function fetchLiveDataFromProxy() {
         const bracketRaw = await bracketRes.json();
 
         // console.log("DEBUG standingsRaw:", standingsRaw);
+        console.log("BRACKET RAW:", bracketRaw);
         // console.log("DEBUG bracketRaw:", bracketRaw);
 
         const standings = standingsRaw?.data;
@@ -400,7 +401,8 @@ export default function LeaderboardPage() {
                 USE_PROXY ? fetchLiveDataFromProxy() : fetchExternalLiveData()
                 // await fetchLiveDataFromProxy()
             ]);
-            
+
+            console.log("RAW PROXY RESPONSE:", liveData);
             console.log("LIVE DATA:", JSON.stringify(liveData, null, 2));
             console.log("KNOCKOUT:", liveData?.knockout);
     
