@@ -394,7 +394,7 @@ export default function LeaderboardPage() {
     async function loadLeaderboardData() { 
         setLoading(true); 
         try { 
-            const [submissionsRes, actualsRes] = await Promise.all([
+            const [submissionsRes, actualsRes, ] = await Promise.all([
                 fetch(`${API_BASE}?action=all`),
                 getActuals().catch(() => ({ ok: false, data: null })),
                 // USE_PROXY ? fetchLiveDataFromProxy() : fetchExternalLiveData()
@@ -418,9 +418,9 @@ export default function LeaderboardPage() {
     
             // LIVE (del 1 + del 3) – kommer nå fra proxy / external
             setActual({
-                groups: srv.groups || {},
+                groups: srv?.groups || {},
                 part2: srv?.part2 || {},
-                knockout: srv.knockout || {}
+                knockout: srv?.knockout || {}
             });
     
             setPart2Actual(srv?.part2 || {}); 
