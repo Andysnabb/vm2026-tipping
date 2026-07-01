@@ -402,6 +402,7 @@ export default function LeaderboardPage() {
             ]);
             
             console.log("LIVE DATA:", liveData);
+            console.log("KNOCKOUT:", liveData?.knockout);
     
             // SUBMISSIONS
             const submissionsJson = await submissionsRes.json(); 
