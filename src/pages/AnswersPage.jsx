@@ -61,12 +61,6 @@ export default function AnswersPage() {
         return userAnswers.some(answer => actualAnswers.includes(answer));
     };
     
-        // Vanlige spørsmål
-        const userAnswer = (part2[question] ?? "").toString().trim().toLowerCase();
-        const actualAnswer = (actual.part2[question] ?? "").toString().trim().toLowerCase();
-    
-        return userAnswer === actualAnswer;
-    };
     const isCorrectPart3 = (key, part3, index) => {
         if (!actual?.knockout) return false;
         if (!part3) return false;
