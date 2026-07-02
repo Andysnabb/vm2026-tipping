@@ -128,6 +128,10 @@ async function fetchLiveDataFromProxy() {
         const standingsRaw = await standingsRes.json();
         const bracketRaw = await bracketRes.json();
 
+        console.log("Datakilde live-data:", {
+            grupper: standingsRaw?.source || "ukjent",
+            sluttspill: bracketRaw?.source || "ukjent"
+        });
         // console.log("DEBUG standingsRaw:", standingsRaw);
         // console.log("BRACKET RAW:", bracketRaw);
         // console.log("DEBUG bracketRaw:", bracketRaw);
