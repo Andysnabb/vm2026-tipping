@@ -124,7 +124,7 @@ function isWinner(winner, sideName, sideKey) {
 function extractBracketMatches(payload) {
     const rounds = Array.isArray(payload?.rounds) ? payload.rounds : [];
     const actualBracketRound = rounds.find(
-        round => round?.name === "match_ups" && Array.isArray(round?.matchups)
+        round => Array.isArray(round?.matchups)
     );
 
     if (!actualBracketRound) {
@@ -463,7 +463,7 @@ export default function LivePage() {
             setLoading(true);
             setError("");
 
-            const bracketRes = await fetch(`${API_BASE}?action=liveBracketParsed`);
+            const bracketRes = await fetch(`${API_BASE}?action=liveBracket`);
 
             if (!bracketRes.ok) {
                 throw new Error(`Bracket-feil: ${bracketRes.status}`);
@@ -476,7 +476,10 @@ export default function LivePage() {
                 throw new Error("Bracket mangler data");
             }
 
-            setMatches(bracket.knockout || {});
+            const extractedMatches = extractBracketMatches(bracket);
+            const grouped = groupMatchesByRound(extractMatches);
+
+            setMatches(grouped);
         } catch (err) {
             console.error("LOAD KNOCKOUT FEIL:", err);
             setError(err instanceof Error ? err.message : "Ukjent feil");
@@ -496,7 +499,14 @@ export default function LivePage() {
     }, [view]);
 
     const groupedMatches = useMemo(() => {
-        return knockoutToGroupedMatches(matches || {});
+        return matches || {
+            "16-delsfinale": [],
+            "8-delsfinale": [],
+            "Kvartfinale": [],
+            "Semifinale": [],
+            "Finale": [],
+            "Bronsefinale": []
+        };
     }, [matches]);
 
     const hasKnockoutMatches = Object.values(groupedMatches).some(
