@@ -138,6 +138,21 @@ function extractBracketMatches(payload) {
         const home = normalizeTeamName(match?.home);
         const away = normalizeTeamName(match?.away);
         const winner = pick(match?.winner, match?.winning_side, match?.winner_name, "");
+        const homeScoreRaw = pick(match?.home_score, match?.scores?.home, match?.goals?.home, "");
+        const awayScoreRaw = pick(match?.away_score, match?.scores?.away, match?.goals?.away, "");
+        
+        const homeScoreNumber = Number(homeScoreRaw);
+        const awayScoreNumber = Number(awayScoreRaw);
+        
+        const hasScore =
+            homeScoreRaw !== "" &&
+            awayScoreRaw !== "" &&
+            !Number.isNaN(homeScoreNumber) &&
+            !Number.isNaN(awayScoreNumber) &&
+            (homeScoreNumber > 0 || awayScoreNumber > 0);
+        
+        const homeScoreLabel = hasScore ? String(homeScoreRaw) : "";
+        const awayScoreLabel = hasScore ? String(awayScoreRaw) : "";
         const dateRaw = pick(
             match?.date,
             match?.match_date,
@@ -161,12 +176,18 @@ function extractBracketMatches(payload) {
             homeLogo: sanitizeImageUrl(match?.home_logo),
             awayLogo: sanitizeImageUrl(match?.away_logo),
             score: getScore(match),
+            homeScore: homeScoreLabel,
+            awayScore: awayScoreLabel,
             status,
             winner,
             dateRaw,
             dateLabel: formatMatchDate(dateRaw),
-            homeIsWinner: isWinner(winner, home, "home"),
-            awayIsWinner: isWinner(winner, away, "away")
+            homeIsWinner: hasScore
+                ? homeScoreNumber > awayScoreNumber
+                : isWinner(winner, home, "home"),
+            awayIsWinner: hasScore
+                ? awayScoreNumber > homeScoreNumber
+                : isWinner(winner, away, "away")
         };
     });
 }
@@ -285,7 +306,7 @@ function StandingTable({ rows }) {
     );
 }
 
-function BracketTeamRow({ name, logo, winner = false }) {
+function BracketTeamRow({ name, logo, score = "", winner = false }) {
     return (
         <div
             style={{
@@ -293,11 +314,21 @@ function BracketTeamRow({ name, logo, winner = false }) {
                 ...(winner ? styles.bracketTeamRowWinner : null)
             }}
         >
-            <TeamLogo src={logo} alt={name || "TBD"} size={18} />
-            <span style={{ ...styles.bracketTeamName, ...(winner ? styles.bracketTeamNameWinner : null) }} title={name || "TBD"}>
+            {logo}
+
+            <span
+                style={{
+                    ...styles.bracketTeamName,
+                    ...(winner ? styles.bracketTeamNameWinner : null)
+                }}
+                title={name || "TBD"}
+            >
                 {name || "TBD"}
             </span>
-            {winner ? <span style={styles.winnerBadge}>Vinner</span> : null}
+
+            <span style={styles.bracketTeamScore}>
+                {score}
+            </span>
         </div>
     );
 }
@@ -324,7 +355,6 @@ function MatchCard({ match, compact = false }) {
         >
             <div style={styles.matchHeader}>
                 <span style={styles.matchTitle}>{match.name}</span>
-                <span style={styles.scorePill}>{match.score || "-"}</span>
             </div>
 
             <MatchMeta match={match} />
@@ -332,11 +362,13 @@ function MatchCard({ match, compact = false }) {
             <BracketTeamRow
                 name={match.home}
                 logo={match.homeLogo}
+                score={match.homeScore}
                 winner={match.homeIsWinner}
             />
             <BracketTeamRow
                 name={match.away}
                 logo={match.awayLogo}
+                score={match.awayScore}
                 winner={match.awayIsWinner}
             />
         </div>
