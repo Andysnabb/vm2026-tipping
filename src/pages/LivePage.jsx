@@ -368,138 +368,232 @@ function KnockoutBracket({ groupedMatches }) {
     );
 }
 
-export default function LivePage() {
+function teamsToMatches(teams = [], roundName) {
+    const list = Array.isArray(teams) ? teams : [];
+
+    const matches = [];
+
+    for (let i = 0; i < list.length; i += 2) {
+        const home = list[i] || "";
+        const away = list[i + 1] || "";
+
+        if (!home && !away) continue;
+
+        const matchNumber = Math.floor(i / 2) + 1;
+
+        matches.push({
+            id: `${roundName}-${matchNumber}`,
+            round: roundName,
+            matchNumber,
+            name: `${roundName} ${matchNumber}`,
+            home,
+            away,
+            homeLogo: "",
+            awayLogo: "",
+            score: "",
+            status: "",
+            winner: "",
+            dateLabel: "",
+            homeIsWinner: false,
+            awayIsWinner: false
+        });
+    }
+
+    return matches;
+}
+
+function knockoutToGroupedMatches(knockout = {}) {
+    return {
+        "16-delsfinale": teamsToMatches(knockout.r32, "16-delsfinale"),
+        "8-delsfinale": teamsToMatches(knockout.r16, "8-delsfinale"),
+        "Kvartfinale": teamsToMatches(knockout.qf, "Kvartfinale"),
+        "Semifinale": teamsToMatches(knockout.sf, "Semifinale"),
+        "Finale": teamsToMatches(knockout.f, "Finale")
+    };
+}
+
+export default function LivePage() {export default function LivePage() {
+    const [view, setView] = useState("knockout");
+
     const [groups, setGroups] = useState({});
     const [thirds, setThirds] = useState([]);
-    const [matches, setMatches] = useState({});
-    const [loading, setLoading] = useState(true);
+    const [matches, setMatches] = useState(null);
+
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-    async function load() {
+    async function loadGroups() {
         try {
             setLoading(true);
             setError("");
-    
-            // Bruk samme proxy-endepunkter som LeaderboardPage
-            const [standingsRes, bracketRes] = await Promise.all([
-                fetch(`${API_BASE}?action=liveParsed`),
-                fetch(`${API_BASE}?action=liveBracketParsed`)
-            ]);
-    
+
+            const standingsRes = await fetch(`${API_BASE}?action=liveParsed`);
+
             if (!standingsRes.ok) {
                 throw new Error(`Standings-feil: ${standingsRes.status}`);
             }
-            if (!bracketRes.ok) {
-                throw new Error(`Bracket-feil: ${bracketRes.status}`);
-            }
-    
-            const standingsRaw = await standingsRes.json();
-            // console.log("STANDINGS RAW:", standingsRaw);
-            // console.log("STANDINGS RAW DATA:", standingsRaw.data);
 
-            const bracketRaw = await bracketRes.json();    
+            const standingsRaw = await standingsRes.json();
             const standings = standingsRaw?.data;
-            const bracket = bracketRaw?.data;
-    
+
             if (!standings) {
-                throw new Error("Standings mangler 'data'-felt");
+                throw new Error("Standings mangler data");
             }
-            if (!bracket) {
-                throw new Error("Bracket mangler 'data'-felt");
-            }
-    
-            // Her antar vi at backend nå returnerer ferdig-parset struktur:
-            // standings.groups: { A: [...], B: [...], ... }
-            // standings.thirds: [...]
-            // bracket.knockout: { ... }
+
             const normalizedGroups = {};
-                for (const [letter, rows] of Object.entries(standings.groups || {})) {
-                    normalizedGroups[letter] = rows.map((row, i) => normalizeStandingRow(row, i));
-                }
-            setGroups(normalizedGroups);
-        
-            setThirds(extractBestThirds(standingsRaw.data));
-            setMatches(bracket.knockout || {});
-    
-            try {
-                const liveActual = {
-                    groups: standings.groups || {},
-                    knockout: bracket.knockout || {}
-                };
-                localStorage.setItem("actual_live", JSON.stringify(liveActual));
-            } catch {
-                // ignorer lagringsfeil
+
+            for (const [letter, rows] of Object.entries(standings.groups || {})) {
+                normalizedGroups[letter] = rows.map((row, i) =>
+                    normalizeStandingRow(row, i)
+                );
             }
-    
+
+            setGroups(normalizedGroups);
+            setThirds(extractBestThirds(standingsRaw.data));
         } catch (err) {
-            console.error("LOAD FEIL:", err);
+            console.error("LOAD GROUPS FEIL:", err);
             setError(err instanceof Error ? err.message : "Ukjent feil");
         } finally {
             setLoading(false);
         }
     }
 
-    load();
-}, []);
+    async function loadKnockout() {
+        try {
+            setLoading(true);
+            setError("");
 
-    // const groupedMatches = useMemo(() => groupMatchesByRound(matches), [matches]);
+            const bracketRes = await fetch(`${API_BASE}?action=liveBracketParsed`);
+
+            if (!bracketRes.ok) {
+                throw new Error(`Bracket-feil: ${bracketRes.status}`);
+            }
+
+            const bracketRaw = await bracketRes.json();
+            const bracket = bracketRaw?.data;
+
+            if (!bracket) {
+                throw new Error("Bracket mangler data");
+            }
+
+            setMatches(bracket.knockout || {});
+        } catch (err) {
+            console.error("LOAD KNOCKOUT FEIL:", err);
+            setError(err instanceof Error ? err.message : "Ukjent feil");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        if (view === "knockout" && matches === null) {
+            loadKnockout();
+        }
+
+        if (view === "groups" && Object.keys(groups).length === 0) {
+            loadGroups();
+        }
+    }, [view]);
+
     const groupedMatches = useMemo(() => {
-        return {
-            r32: matches.r32 || [],
-            r16: matches.r16 || [],
-            qf: matches.qf || [],
-            sf: matches.sf || [],
-            f: matches.f || []
-        };
+        return knockoutToGroupedMatches(matches || {});
     }, [matches]);
 
-    if (loading) {
-        return <div style={styles.stateMessage}>Laster...</div>;
-    }
-    
-    if (error) {
-        return <div style={{ ...styles.stateMessage, color: "crimson" }}>{error}</div>;
-    }
-    
+    const hasKnockoutMatches = Object.values(groupedMatches).some(
+        roundMatches => roundMatches.length > 0
+    );
+
     return (
         <div style={styles.page}>
             <div style={styles.headerRow}>
                 <div>
                     <h1 style={styles.pageTitle}>VM Oversikt</h1>
                     <div style={styles.pageSubtitle}>
-                        Gruppespill, beste treere og sluttspill i én oversikt.
+                        Sluttspill og gruppespill i én oversikt.
                     </div>
                 </div>
             </div>
-    
-            <section style={styles.section}>
-                <h2 style={styles.sectionTitle}>Grupper</h2>
-                {Object.entries(groups).map(([letter, rows]) => (
-                    <div key={letter} style={styles.groupBlock}>
-                        <h3 style={styles.groupTitle}>Gruppe {letter}</h3>
-                        <StandingTable rows={rows} />
-                    </div>
-                ))}
-            </section>
-    
-            <section style={styles.section}>
-                <h2 style={styles.sectionTitle}>Beste treere</h2>
-                {thirds.length === 0 ? (
-                    <div style={styles.emptyState}>Fant ingen tredjeplasser.</div>
-                ) : (
-                    <StandingTable rows={thirds} />
-                )}
-            </section>
-    
-            <section style={styles.section}>
-                <h2 style={styles.sectionTitle}>Sluttspill</h2>
-                {Object.keys(matches).length === 0 ? (
-                    <div style={styles.emptyState}>Fant ingen sluttspillkamper.</div>
-                ) : (
-                    <KnockoutBracket groupedMatches={groupedMatches} />
-                )}
-            </section>
+
+            <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+                <button
+                    onClick={() => setView("knockout")}
+                    style={{
+                        padding: "8px 14px",
+                        border: "1px solid #ccc",
+                        borderRadius: 6,
+                        background: view === "knockout" ? "#333" : "#fff",
+                        color: view === "knockout" ? "#fff" : "#000",
+                        cursor: "pointer"
+                    }}
+                >
+                    Sluttspill
+                </button>
+
+                <button
+                    onClick={() => setView("groups")}
+                    style={{
+                        padding: "8px 14px",
+                        border: "1px solid #ccc",
+                        borderRadius: 6,
+                        background: view === "groups" ? "#333" : "#fff",
+                        color: view === "groups" ? "#fff" : "#000",
+                        cursor: "pointer"
+                    }}
+                >
+                    Gruppespill
+                </button>
+            </div>
+
+            {loading && (
+                <div style={styles.stateMessage}>Laster...</div>
+            )}
+
+            {error && !loading && (
+                <div style={{ ...styles.stateMessage, color: "crimson" }}>
+                    {error}
+                </div>
+            )}
+
+            {!loading && !error && view === "knockout" && (
+                <section style={styles.section}>
+                    <h2 style={styles.sectionTitle}>Sluttspill</h2>
+
+                    {!hasKnockoutMatches ? (
+                        <div style={styles.emptyState}>
+                            Fant ingen sluttspillkamper.
+                        </div>
+                    ) : (
+                        <KnockoutBracket groupedMatches={groupedMatches} />
+                    )}
+                </section>
+            )}
+
+            {!loading && !error && view === "groups" && (
+                <>
+                    <section style={styles.section}>
+                        <h2 style={styles.sectionTitle}>Grupper</h2>
+
+                        {Object.entries(groups).map(([letter, rows]) => (
+                            <div key={letter} style={styles.groupBlock}>
+                                <h3 style={styles.groupTitle}>Gruppe {letter}</h3>
+                                <StandingTable rows={rows} />
+                            </div>
+                        ))}
+                    </section>
+
+                    <section style={styles.section}>
+                        <h2 style={styles.sectionTitle}>Beste treere</h2>
+
+                        {thirds.length === 0 ? (
+                            <div style={styles.emptyState}>
+                                Fant ingen tredjeplasser.
+                            </div>
+                        ) : (
+                            <StandingTable rows={thirds} />
+                        )}
+                    </section>
+                </>
+            )}
         </div>
     );
 }
