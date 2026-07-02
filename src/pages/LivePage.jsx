@@ -804,6 +804,15 @@ const styles = {
     bracketTeamNameWinner: {
         color: "#166534"
     },
+    bracketTeamScore: {
+    marginLeft: "auto",
+    minWidth: 24,
+    textAlign: "right",
+    fontSize: 15,
+    fontWeight: 800,
+    color: "#111827",
+    fontVariantNumeric: "tabular-nums"
+    },
     winnerBadge: {
         marginLeft: "auto",
         display: "inline-flex",
