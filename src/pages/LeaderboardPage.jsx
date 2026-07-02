@@ -402,13 +402,13 @@ export default function LeaderboardPage() {
                 // await fetchLiveDataFromProxy()
             ]);
 
-            console.log("RAW PROXY RESPONSE:", liveData);
-            console.log("LIVE DATA:", JSON.stringify(liveData, null, 2));
-            console.log("KNOCKOUT:", liveData?.knockout);
+            // console.log("RAW PROXY RESPONSE:", liveData);
+            // console.log("LIVE DATA:", JSON.stringify(liveData, null, 2));
+            // console.log("KNOCKOUT:", liveData?.knockout);
     
             // SUBMISSIONS
             const submissionsJson = await submissionsRes.json(); 
-            console.log("SUBMISSIONS JSON:", submissionsJson);
+            // console.log("SUBMISSIONS JSON:", submissionsJson);
             if (submissionsJson?.ok && Array.isArray(submissionsJson.data)) { 
                 setData(submissionsJson.data); 
             } else if (Array.isArray(submissionsJson)) {
