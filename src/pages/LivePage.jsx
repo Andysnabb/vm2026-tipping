@@ -412,7 +412,7 @@ function knockoutToGroupedMatches(knockout = {}) {
     };
 }
 
-export default function LivePage() {export default function LivePage() {
+export default function LivePage() {
     const [view, setView] = useState("knockout");
 
     const [groups, setGroups] = useState({});
