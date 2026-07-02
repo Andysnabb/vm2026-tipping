@@ -477,7 +477,7 @@ export default function LivePage() {
             }
 
             const extractedMatches = extractBracketMatches(bracket);
-            const grouped = groupMatchesByRound(extractMatches);
+            const grouped = groupMatchesByRound(extractedMatches);
 
             setMatches(grouped);
         } catch (err) {
