@@ -28,9 +28,9 @@ export default function App() {
 
             <nav className="nav-buttons">
                 <NavLinkButton to="/">Hjem</NavLinkButton>
-                <NavLinkButton to="/part1">Del 1</NavLinkButton>
-                <NavLinkButton to="/part2">Del 2</NavLinkButton>
-                <NavLinkButton to="/part3">Del 3</NavLinkButton>
+                {/* <NavLinkButton to="/part1">Del 1</NavLinkButton> */}
+                {/* <NavLinkButton to="/part2">Del 2</NavLinkButton> */}
+                {/* <NavLinkButton to="/part3">Del 3</NavLinkButton> */}
                 <NavLinkButton to="/answers">Alle svar</NavLinkButton>
                 <NavLinkButton to="/leaderboard">Poeng</NavLinkButton>
                 <NavLinkButton to="/live">Livedata</NavLinkButton>
