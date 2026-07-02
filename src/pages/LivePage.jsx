@@ -314,7 +314,7 @@ function BracketTeamRow({ name, logo, score = "", winner = false }) {
                 ...(winner ? styles.bracketTeamRowWinner : null)
             }}
         >
-            {logo}
+            {TeamLogo({ src: logo, alt: name || "TBD", size: 18 })}
 
             <span
                 style={{
